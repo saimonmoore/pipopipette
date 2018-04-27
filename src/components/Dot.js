@@ -28,7 +28,15 @@ class Dot extends Component {
   }
 
   render() {
-    return (<circle cx={this.x} cy={this.y} r={this.radius} stroke="green" fill="yellow" onClick={this.onClick}/>);
+    return (<circle
+               cx={this.x}
+               cy={this.y}
+               r={this.radius}
+               stroke="green"
+               strokeWidth="4"
+               fill="yellow"
+               className="dot"
+               onClick={this.onClick}/>);
   }
 }
 
