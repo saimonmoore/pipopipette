@@ -1,12 +1,16 @@
 import { decorate, observable } from "mobx"
 
+import Line from './Line.js'
+
 class Box {
   static getPixels(point) {
     return point * 100 + 20 + 10
   }
 
-  static willClose({ store, fromDot, toDot }) {
-    const { lines } = store.lines
+  static findBoxes(line, boxes) {
+    return boxes.filter((box) => {
+      return box.containsPoint(line.toDot.coordinates)
+    })
   }
 
   constructor({ topLeft, topRight, bottomLeft, bottomRight }) {
@@ -16,9 +20,14 @@ class Box {
     this.bottomRight = bottomRight
 
     this.closed = observable.box(false)
-    this.user = observable.box("SM")
+    this.user = observable.box("")
 
-    this.lines = {}
+    this.edges = {
+      topLeftTopRight: null,
+      topRightBottomRight: null,
+      bottomRightBottomLeft: null,
+      bottomLeftTopLeft: null,
+    }
   }
 
   get id() {
@@ -50,10 +59,69 @@ class Box {
     const y1 = Box.getPixels(this.topLeft[1])
     return y1 + 55
   }
+
+  containsPoint(coordinates) {
+    return JSON.stringify(this.topLeft) === JSON.stringify(coordinates)
+        || JSON.stringify(this.topRight) === JSON.stringify(coordinates)
+        || JSON.stringify(this.bottomRight) === JSON.stringify(coordinates)
+        || JSON.stringify(this.bottomLeft) === JSON.stringify(coordinates)
+  }
+
+  isClosed() {
+    const { topLeftTopRight, topRightBottomRight, bottomRightBottomLeft, bottomLeftTopLeft } = this.edges
+    return !!topLeftTopRight && !!topRightBottomRight && !!bottomRightBottomLeft && !!bottomLeftTopLeft
+  }
+
+  topLeftTopRightEdge() {
+    return JSON.stringify(Line.sortConnection([this.topLeft, this.topRight]))
+  }
+
+  topRightBottomRightEdge() {
+    return JSON.stringify(Line.sortConnection([this.topRight, this.bottomRight]))
+  }
+
+  bottomRightBottomLeftEdge() {
+    return JSON.stringify(Line.sortConnection([this.bottomRight, this.bottomLeft]))
+  }
+
+  bottomLeftTopLeftEdge() {
+    return JSON.stringify(Line.sortConnection([this.bottomLeft, this.topLeft]))
+  }
+
+  findEdgeForLine(line) {
+    const connection = line.connection
+    const edge = JSON.stringify(connection)
+
+    const tltr = this.topLeftTopRightEdge()
+    const trbr = this.topRightBottomRightEdge()
+    const brbl = this.bottomRightBottomLeftEdge()
+    const bltl = this.bottomLeftTopLeftEdge()
+
+    if (edge === tltr) return "topLeftTopRight"
+    if (edge === trbr) return "topRightBottomRight"
+    if (edge === brbl) return "bottomRightBottomLeft"
+    if (edge === bltl) return "bottomLeftTopLeft"
+
+    return null
+  }
+
+  addLine(line) {
+    const edge = this.findEdgeForLine(line)
+
+    if (!edge) return
+    if (!!this.edges[edge]) return
+
+    this.edges[edge] = line.connection
+
+    if (!this.closed.get() && this.isClosed()) {
+      this.closed.set(true)
+      this.user.set(line.user)
+    }
+  }
 }
 
 decorate(Box, {
-  lines: observable
+  edges: observable
 })
 
 export default Box

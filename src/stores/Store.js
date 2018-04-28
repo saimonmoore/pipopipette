@@ -68,6 +68,10 @@ class Store {
 
   addLine(line) {
     this.lines.push(line)
+    const boxes = Box.findBoxes(line, this.boxes)
+    boxes.forEach((box) => {
+      box.addLine(line)
+    })
   }
 
   removeLine(line) {

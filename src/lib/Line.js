@@ -1,4 +1,4 @@
-import { reaction, decorate, observable } from "mobx"
+import { decorate, observable } from "mobx"
 
 class Line {
 
@@ -8,9 +8,10 @@ class Line {
     })
   }
 
-  constructor({ fromDot, toDot }) {
+  constructor({ fromDot, toDot, user }) {
     this.fromDot = fromDot;
     this.toDot = toDot;
+    this.user = user || "SM"
 
     toDot.connect(fromDot)
     fromDot.connect(toDot)

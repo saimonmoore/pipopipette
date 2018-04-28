@@ -46,6 +46,10 @@ class Dot {
 
     return left || right || up || down
   }
+
+  get coordinates() {
+    return [this.column, this.row]
+  }
 }
 
 decorate(Dot, {
