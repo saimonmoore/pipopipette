@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 
+import "./Line.css"
+
 class Line extends Component {
   render() {
     const { line } = this.props
@@ -19,12 +21,15 @@ class Line extends Component {
     const offsetTo = offsets[to.anchor] || { x: 0, y: 0 };
 
     return (
-      <path
-        className="Line"
-        markerEnd="url(#arrow)"
-        stroke="black" stroke-width="3"
-        d={`M ${from.x} ${from.y} L ${from.x + offsetFrom.x} ${from.y + offsetFrom.y} L ${to.x + offsetTo.x} ${to.y + offsetTo.y} L ${to.x} ${to.y}`}
-      />
+      <g stroke="green" strokeWidth="5">
+        <path
+          className="Line"
+          fill="green"
+          d={`M ${from.x} ${from.y} L ${from.x + offsetFrom.x} ${from.y + offsetFrom.y} L ${to.x + offsetTo.x} ${to.y + offsetTo.y} L ${to.x} ${to.y}`}
+        />
+        <circle cx={from.x} cy={from.y} r="3" fill="lightgrey"  />
+        <circle cx={to.x} cy={to.y} r="3" fill="lightgrey"  />
+      </g>
     )
   }
 }

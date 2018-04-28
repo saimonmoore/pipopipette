@@ -7,7 +7,7 @@ class Dot extends Component {
   constructor(props) {
     super(props)
 
-    const { dot, onDotClick, point } = this.props
+    const { dot, onDotClick } = this.props
     const column = dot.column
     const row = dot.row
 

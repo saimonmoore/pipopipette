@@ -83,16 +83,15 @@ class Grid extends Component {
     const { fromX, fromY } = this.state
 
     const active = dots.filter((o) => { 
-      const within = o.x > fromX && o.x < to.x && o.y > fromY && o.y < to.y
       const dotXGreaterThanFromX = o.x > fromX
       const dotXLessThanToX = o.x < to.x
       const dotYGreaterThanFromY = o.y > fromY
       const dotYLessThanToY = o.y < to.y
-      console.table([
-        ["dotX", "dotY", "fromX", "fromY", "toX", "toY", "dotXGreaterThanFromX", "dotXLessThanToX", "dotYGreaterThanFromY", "dotYLessThanToY", "within"],
-        [o.x, o.y, fromX, fromY, to.x, to.y, dotXGreaterThanFromX, dotXLessThanToX, dotYGreaterThanFromY, dotYLessThanToY, within],
-      ])
-      return within
+
+      return dotXGreaterThanFromX
+          && dotXLessThanToX
+          && dotYGreaterThanFromY
+          && dotYLessThanToY
     });
 
     this.setState({
@@ -182,4 +181,4 @@ class Grid extends Component {
   }
 }
 
-export default inject("store")(Grid);
+export default inject("store")(observer(Grid));
