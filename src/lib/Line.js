@@ -4,26 +4,23 @@ class Line {
   constructor({ fromDot, toDot }) {
     this.fromDot = fromDot;
     this.toDot = toDot;
-    this.reaction = reaction(
-      () => fromDot.value,
-      (fromDot, reaction) => {
-        toDot.value = fromDot;
-      }
-    );
-
-    toDot.value = fromDot.value;
+    toDot.connection = fromDot
+    fromDot.connection = toDot
   }
 
   get id() {
     return `from:${this.fromDot.id}|to:${this.toDot.id}`
   }
 
+  static isAlreadyConnected(fromDot, toDot) {
+    if (!fromDot.connection) return false
+    return toDot.connection === fromDot && fromDot.connection === toDot
+  }
+
   static valid({ fromDot, toDot }) {
-    return true
-    // 0. Must not equal destination
-    // 1. Must be adjacent
-    // 2. Must not be diagonally adjacent
-    // 3. Must not already have 2 Lines connected
+    return fromDot !== toDot
+        && fromDot.isAdjacent(toDot)
+        && !this.isAlreadyConnected(fromDot, toDot)
   }
 }
 
@@ -32,4 +29,4 @@ decorate(Line, {
   toDot: observable,
 })
 
-export default Line;
+export default Line

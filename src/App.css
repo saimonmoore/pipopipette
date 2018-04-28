@@ -26,13 +26,3 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
-@keyframes StrokeGrow {
-  from { transform: scale(1, 1); stroke-width: 2px; }
-  to { transform: scale(1, 1); stroke-width: 5px; }
-}
-
-.dot:hover {
-  animation: StrokeGrow 8s linear;
-  cursor: grab;
-}

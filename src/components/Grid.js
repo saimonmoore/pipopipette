@@ -113,6 +113,7 @@ class Grid extends Component {
       if (fromDot === toDot) return;
 
       const valid = Line.valid({ fromDot, toDot });
+      if (!valid) toDot.flash()
 
       if (fromDot !== toDot && valid) {
         store.addLine(new Line({

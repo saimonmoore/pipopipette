@@ -1,0 +1,18 @@
+@keyframes StrokeGrow {
+  from { transform: scale(1, 1); stroke-width: 5px; }
+  to { transform: scale(1, 1); stroke-width: 2px; }
+}
+
+.Dot:hover {
+  animation: StrokeGrow 8s linear;
+  cursor: grab;
+}
+
+.Dot.flash:hover {
+  cursor: not-allowed;
+}
+
+.flash {
+  animation: shake 1s linear;
+  cursor: not-allowed;
+}

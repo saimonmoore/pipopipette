@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 
+import "./Dot.css"
+
 class Dot extends Component {
   radius = 20
 
@@ -12,7 +14,7 @@ class Dot extends Component {
     const row = dot.row
 
     this.onDotClick = onDotClick
-    this.state = { column, row }
+    this.state = { column, row, dot }
 
     this.onClick = this.onClick.bind(this)
   }
@@ -32,6 +34,10 @@ class Dot extends Component {
   }
 
   render() {
+    const { flashing } = this.state.dot
+
+    const classNames = flashing ? "Dot flash" : "Dot"
+
     return (<circle
                cx={this.x}
                cy={this.y}
@@ -39,7 +45,7 @@ class Dot extends Component {
                stroke="green"
                strokeWidth="4"
                fill="yellow"
-               className="dot"
+               className={classNames}
                onClick={this.onClick}/>);
   }
 }
