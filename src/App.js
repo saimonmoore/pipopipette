@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Provider } from "mobx-react"
+import { Provider, observer } from "mobx-react"
 
 import Store from './stores/Store.js'
 import Form from './components/Form.js'
@@ -10,7 +10,10 @@ import './App.css'
 const store = new Store()
 
 class App extends Component {
+
   render() {
+    const { grid_size, boxes, lines, dots } = store
+
     return (
       <Provider store={store}>
         <div className="App">
@@ -18,11 +21,11 @@ class App extends Component {
             <img src={logo} className="App-logo" alt="logo" />
             <Form />
           </header>
-          <Grid />
+          <Grid grid_size={grid_size} dots={dots} lines={lines} boxes={boxes} />
         </div>
       </Provider>
     );
   }
 }
 
-export default App;
+export default observer(App);

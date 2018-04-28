@@ -33,7 +33,7 @@ class Form extends Component {
             Grid size:
             <select value={ grid_size } onChange={this.handleGridSizeChange}>
               { range(this.MAX_GRID_SIZE).map((size) => (
-                <option value={size}>{size} x {size}</option>
+                <option key={`option-${size}`} value={size}>{size} x {size}</option>
               )) }
             </select>
           </label>

@@ -1,12 +1,41 @@
 import { decorate, observable } from "mobx"
 
+import Dot from '../lib/Dot.js'
+import { range } from '../utils.js'
+
 class Store {
-  grid_size = 5
+  grid_size = observable.box(5);
   dots = []
   lines = []
+  boxes = []
+
+  constructor() {
+    this.createDots()
+  }
+
+  clear() {
+    this.dots = []
+    this.lines = []
+    this.boxes = []
+  }
 
   setGridSize(newSize) {
-    this.grid_size = newSize
+    this.clear()
+    this.grid_size.set(newSize)
+    this.createDots()
+  }
+
+  createDots() {
+    range(this.grid_size.get()).forEach((column) => (
+      range(this.grid_size.get()).forEach((row) => {
+        this.createDot({column, row})
+      })
+    ))
+  }
+
+  createDot(column, row) {
+    const dot = new Dot(column, row)
+    this.addDot(dot)
   }
 
   addDot(dot) {
@@ -28,12 +57,22 @@ class Store {
       this.lines.splice(this.lines.indexOf(line), 1);
     });
   }
+
+  addBox(box) {
+    this.boxes.push(box)
+  }
+
+  removeBox(box) {
+    this.boxes.forEach((box) => {
+      this.boxes.splice(this.boxes.indexOf(box), 1);
+    });
+  }
 }
 
 decorate(Store, {
-  grid_size: observable,
   dots: observable,
   lines: observable,
+  boxes: observable,
 })
 
 export default Store

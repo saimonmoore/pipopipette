@@ -3,9 +3,8 @@ import { inject, observer } from "mobx-react";
 
 import DotView from './Dot.js'
 import LineView from './Line.js'
-import Dot from '../lib/Dot.js'
+import BoxView from './Box.js'
 import Line from '../lib/Line.js'
-import { range } from '../utils.js'
 
 class Grid extends Component {
   constructor(props) {
@@ -18,24 +17,6 @@ class Grid extends Component {
     this.handleMouseUp = this.handleMouseUp.bind(this)
     this.onClickObject = this.onClickObject.bind(this)
     this.onDotClick = this.onDotClick.bind(this)
-
-    this.createDots()
-  }
-
-  createDots() {
-    const { grid_size } = this.props.store
-
-    range(grid_size).forEach((column) => (
-      range(grid_size).forEach((row) => {
-        this.createDot({column, row})
-      })
-    ))
-  }
-
-  createDot(column, row) {
-    const { store } = this.props
-    const dot = new Dot(column, row)
-    store.addDot(dot)
   }
 
   componentDidMount () {
@@ -155,12 +136,20 @@ class Grid extends Component {
     />
   }
 
+  renderBox(box) {
+    return <BoxView
+      key={box.id}
+      box={box}
+    />
+  }
+
   render() {
-    const { grid_size, dots, lines } = this.props.store
-    const width = grid_size * 100, height = grid_size * 100
+    const { grid_size, dots, lines, boxes } = this.props
+    const width = grid_size.get() * 100, height = grid_size.get() * 100
 
     const dot_views = dots.map((dot) => (this.renderDot(dot)))
     const line_views = lines.map((line) => (this.renderLine(line)))
+    const box_views = boxes.map((box) => (this.renderBox(box)))
 
     return (
       <div>
@@ -174,6 +163,7 @@ class Grid extends Component {
         >
           {dot_views}
           {line_views}
+          {box_views}
         </svg>
       </div>
     );
