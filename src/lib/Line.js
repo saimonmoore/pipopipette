@@ -4,8 +4,9 @@ class Line {
   constructor({ fromDot, toDot }) {
     this.fromDot = fromDot;
     this.toDot = toDot;
-    toDot.connection = fromDot
-    fromDot.connection = toDot
+
+    toDot.connect(fromDot)
+    fromDot.connect(toDot)
   }
 
   get id() {
@@ -13,8 +14,7 @@ class Line {
   }
 
   static isAlreadyConnected(fromDot, toDot) {
-    if (!fromDot.connection) return false
-    return toDot.connection === fromDot && fromDot.connection === toDot
+    return toDot.connectedTo(fromDot) && fromDot.connectedTo(toDot)
   }
 
   static valid({ fromDot, toDot }) {

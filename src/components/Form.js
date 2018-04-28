@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 
+import { range } from '../utils.js'
+
 class Form extends Component {
+  MAX_GRID_SIZE = 20
+
   constructor(props) {
     super(props)
 
@@ -27,7 +31,11 @@ class Form extends Component {
         <form onSubmit={ this.handleOnSubmit }>
           <label>
             Grid size:
-            <input type="text" name='grid_size' value={ grid_size } onChange={this.handleGridSizeChange} />
+            <select value={ grid_size } onChange={this.handleGridSizeChange}>
+              { range(this.MAX_GRID_SIZE).map((size) => (
+                <option value={size}>{size} x {size}</option>
+              )) }
+            </select>
           </label>
         </form>
       </div>

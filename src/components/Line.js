@@ -25,7 +25,7 @@ class Line extends Component {
         <path
           className="Line"
           fill="green"
-          stroke-linejoin="miter"
+          strokeLinejoin="miter"
           d={`M ${from.x} ${from.y} L ${from.x + offsetFrom.x} ${from.y + offsetFrom.y} L ${to.x + offsetTo.x} ${to.y + offsetTo.y} L ${to.x} ${to.y}`}
         />
         <circle cx={from.x} cy={from.y} r="3" fill="lightgrey"  />

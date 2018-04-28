@@ -7,6 +7,7 @@ class Dot {
   constructor({ column=null, row=null } = {}) {
     this.column = column
     this.row = row
+    this.connections = []
   }
 
   get id() {
@@ -27,6 +28,14 @@ class Dot {
     setTimeout(() => { this.flashing = false }, 1000)
   }
 
+  connect(otherDot) {
+    this.connections.push(otherDot)
+  }
+
+  connectedTo(otherDot) {
+    this.connections.includes(otherDot)
+  }
+
   isAdjacent(toDot) {
     const {column: x1, row: y1 } = this
     const {column: x2, row: y2 } = toDot
@@ -42,6 +51,7 @@ class Dot {
 decorate(Dot, {
   column: observable,
   row: observable,
+  connections: observable,
   flashing: observable,
   x: computed,
   y: computed,

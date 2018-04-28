@@ -5,6 +5,7 @@ import DotView from './Dot.js'
 import LineView from './Line.js'
 import Dot from '../lib/Dot.js'
 import Line from '../lib/Line.js'
+import { range } from '../utils.js'
 
 class Grid extends Component {
   constructor(props) {
@@ -22,8 +23,10 @@ class Grid extends Component {
   }
 
   createDots() {
-    this.range().forEach((column) => (
-      this.range().forEach((row) => {
+    const { grid_size } = this.props.store
+
+    range(grid_size).forEach((column) => (
+      range(grid_size).forEach((row) => {
         this.createDot({column, row})
       })
     ))
@@ -115,7 +118,7 @@ class Grid extends Component {
       const valid = Line.valid({ fromDot, toDot });
       if (!valid) toDot.flash()
 
-      if (fromDot !== toDot && valid) {
+      if (valid) {
         store.addLine(new Line({
           fromDot,
           toDot,
@@ -131,11 +134,6 @@ class Grid extends Component {
 
       document.addEventListener('mousemove', this.onDotMouseMove);
     }
-  }
-
-  range() {
-    const { grid_size } = this.props.store
-    return Array.apply(null, {length: grid_size}).map(Number.call, Number)
   }
 
   renderDot(dot) {
