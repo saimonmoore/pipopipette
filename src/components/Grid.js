@@ -78,8 +78,6 @@ class Grid extends Component {
           && dotYLessThanToY
     });
 
-    console.log("=====> active? ", active)
-
     this.setState({
       active,
       fromX: null,

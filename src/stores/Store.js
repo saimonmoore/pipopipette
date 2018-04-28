@@ -1,17 +1,39 @@
-import { decorate, observable } from "mobx"
+import { decorate, observable, toJS } from "mobx"
 
 import Dot from '../lib/Dot.js'
 import Box from '../lib/Box.js'
 import { range } from '../utils.js'
+import Storage from '../lib/Storage.js'
+
+const storage = new Storage()
 
 class Store {
   grid_size = observable.box(5);
   dots = []
   lines = []
   boxes = []
+  user = {}
+  session = {}
 
   constructor() {
     this.setup()
+  }
+
+  persistSession() {
+    const session_id = this.session.session.id
+    storage.setUser(session_id, toJS(this.user))
+    storage.setDots(session_id, this.serialize(this.dots))
+    storage.setLines(session_id, this.serialize(this.lines))
+    storage.setBoxes(session_id, this.serialize(this.boxes))
+  }
+
+  saveSession(session) {
+    const grid_size = this.grid_size.get()
+    Object.assign(this.user, { grid_size })
+    Object.assign(this.user, session.user)
+    Object.assign(this.session, session)
+
+    this.persistSession()
   }
 
   clear() {
@@ -72,6 +94,8 @@ class Store {
     boxes.forEach((box) => {
       box.addLine(line)
     })
+
+    this.persistSession()
   }
 
   removeLine(line) {
@@ -89,12 +113,18 @@ class Store {
       this.boxes.splice(this.boxes.indexOf(box), 1);
     });
   }
+
+  serialize(objects) {
+    return objects.map((object) => (object.serialize()))
+  } 
 }
 
 decorate(Store, {
   dots: observable,
   lines: observable,
   boxes: observable,
+  user: observable,
+  session: observable,
 })
 
 export default Store

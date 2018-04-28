@@ -18,10 +18,13 @@ class App extends Component {
   constructor(props) {
     super(props)
 
-    this.initSession()
+    this.initSession((session) => {
+      store.saveSession(session)
+      this.state = { session }
+    })
   }
 
-  initSession() {
+  initSession(fn) {
     let session = this.session()
 
     if (!session) {
@@ -31,11 +34,13 @@ class App extends Component {
         } else {
           session = this.createSession()
           this.login(session)
+          fn(session)
         }
       })
     } else {
       window.location.hash = session.session.id
       this.login(session)
+      fn(session)
     }
   }
 
@@ -116,6 +121,7 @@ class App extends Component {
   }
 
   render() {
+    const { session } = this.state
     const { grid_size, boxes, lines, dots } = store
 
     return (
@@ -123,7 +129,7 @@ class App extends Component {
         <div className="App">
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
-            <Form />
+            <Form session={session} />
           </header>
           <Grid grid_size={grid_size} dots={dots} lines={lines} boxes={boxes} />
         </div>

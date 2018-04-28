@@ -1,4 +1,6 @@
-import { decorate, observable } from "mobx"
+import { decorate, observable, toJS } from "mobx"
+
+import Dot from "./Dot.js"
 
 class Line {
 
@@ -39,11 +41,29 @@ class Line {
         && fromDot.isAdjacent(toDot)
         && !this.isAlreadyConnected(fromDot, toDot)
   }
+
+  serialize() {
+    const [ fromCoords, toCoords ] = this.connection
+    const user = this.user
+    const from = { column: fromCoords[0], row: fromCoords[1] }
+    const to = { column: toCoords[0], row: toCoords[1] }
+
+    return { from, to, user }
+  }
+
+  static unserialize(data) {
+    const from = new Dot(data.from)
+    const to = new Dot(data.to)
+    const user = toJS(data.user)
+
+    return new Line(from, to, user)
+  }
 }
 
 decorate(Line, {
   fromDot: observable,
   toDot: observable,
+  user: observable,
 })
 
 export default Line

@@ -1,4 +1,4 @@
-import { decorate, observable } from "mobx"
+import { decorate, observable, toJS } from "mobx"
 
 import Line from './Line.js'
 
@@ -117,6 +117,27 @@ class Box {
       this.closed.set(true)
       this.user.set(line.user)
     }
+  }
+
+  serialize() {
+    const { topLeft, topRight, bottomLeft, bottomRight } = this
+    const coords = { topLeft, topRight, bottomLeft, bottomRight }
+    const edges = toJS(this.edges)
+    const user = toJS(this.user)
+    const closed = toJS(this.closed)
+
+    return { coords, edges, user, closed }
+  }
+
+  static unserialize(data) {
+    const { coords, edges, user, closed } = data
+    const box = new Box(coords)
+
+    Object.assign(box.edges, edges)
+    box.user.set(user)
+    box.closed.set(closed)
+
+    return box
   }
 }
 

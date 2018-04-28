@@ -1,5 +1,7 @@
 import * as firebase from "firebase";
 
+import { to } from '../utils.js'
+
 const APP = "pipopipette"
 
 class Storage {
@@ -30,7 +32,7 @@ class Storage {
 
   // e.g. grid_size, colour
   setUser(session_name, user) {
-    this.storage().ref(`${APP}/${session_name}/users/user_${user.id}`).set(user);
+    this.storage().ref(`${APP}/${session_name}/users/user_${user.user_id}`).set(user);
   }
 
   setDots(session_name, dots) {

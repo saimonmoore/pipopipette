@@ -8,7 +8,7 @@ class Box extends Component {
     return (
        <g stroke="red" strokeWidth="5">
         <polygon points={box.coordinates} fill="lightgrey"  />
-        <text x={box.textXCoord} y={box.textYCoord} font-family="Verdana" font-size="30" font-weight="bold" stroke="none" fill="black">
+        <text x={box.textXCoord} y={box.textYCoord} fontFamily="Verdana" fontSize="30" fontWeight="bold" stroke="none" fill="black">
           {box.user.get()}
         </text>
       </g>

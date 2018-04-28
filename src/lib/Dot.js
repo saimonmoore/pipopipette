@@ -50,6 +50,15 @@ class Dot {
   get coordinates() {
     return [this.column, this.row]
   }
+
+  serialize() {
+    const { column, row } = this
+    return { column, row }
+  }
+
+  static unserialize(data) {
+    return new Dot(data)
+  }
 }
 
 decorate(Dot, {
