@@ -2,15 +2,27 @@ import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 
 class Box extends Component {
-  render() {
+  renderBox() {
+    const { box } = this.props
+
     return (
-      <g stroke="red" strokeWidth="5">
-        <polygon points="0,130 130,0 130,130 0,130" fill="lightgrey"  />
-        <text x="5" y="35" font-family="Verdana" font-size="25" font-weight="bold" stroke="none" fill="black">
-          SM
+       <g stroke="red" strokeWidth="5">
+        <polygon points={box.coordinates} fill="lightgrey"  />
+        <text x={box.textXCoord} y={box.textYCoord} font-family="Verdana" font-size="30" font-weight="bold" stroke="none" fill="black">
+          {box.user.get()}
         </text>
       </g>
     )
+  }
+
+  render() {
+    const { box } = this.props
+
+    if (!box.closed.get()) {
+      return null
+    }
+
+    return this.renderBox()
   }
 }
 

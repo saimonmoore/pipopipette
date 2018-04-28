@@ -1,6 +1,7 @@
 import { decorate, observable } from "mobx"
 
 import Dot from '../lib/Dot.js'
+import Box from '../lib/Box.js'
 import { range } from '../utils.js'
 
 class Store {
@@ -10,7 +11,7 @@ class Store {
   boxes = []
 
   constructor() {
-    this.createDots()
+    this.setup()
   }
 
   clear() {
@@ -22,20 +23,37 @@ class Store {
   setGridSize(newSize) {
     this.clear()
     this.grid_size.set(newSize)
-    this.createDots()
+    this.setup()
   }
 
-  createDots() {
+  setup() {
     range(this.grid_size.get()).forEach((column) => (
       range(this.grid_size.get()).forEach((row) => {
         this.createDot({column, row})
       })
     ))
+
+    // We create N-1 x N-1 boxes from a N x N node grid
+    range(this.grid_size.get() - 1).forEach((row) => {
+      range(this.grid_size.get() - 1).forEach((column) => {
+        this.createBox(column, row)
+      })
+    })
   }
 
   createDot(column, row) {
     const dot = new Dot(column, row)
     this.addDot(dot)
+  }
+
+  createBox(column, row) {
+    const topLeft = [column, row]
+    const topRight = [column + 1, row]
+    const bottomRight = [column + 1, row + 1 ]
+    const bottomLeft = [column, row + 1]
+    const box = new Box({topLeft, topRight, bottomRight, bottomLeft})
+
+    this.addBox(box)
   }
 
   addDot(dot) {
