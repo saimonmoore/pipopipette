@@ -7,10 +7,18 @@ class Dot extends Component {
   constructor(props) {
     super(props)
 
-    const { column, row } = this.props
+    const { dot, onDotClick, point } = this.props
+    const column = dot.column
+    const row = dot.row
 
+    this.onDotClick = onDotClick
     this.state = { column, row }
+
     this.onClick = this.onClick.bind(this)
+  }
+
+  onClick(event) {
+    this.onDotClick(this.props.dot)
   }
 
   get x() {
@@ -21,10 +29,6 @@ class Dot extends Component {
   get y() {
     const { row } = this.state
     return row * 100 + this.radius + 10
-  }
-
-  onClick(event) {
-    console.log(event.target)
   }
 
   render() {
