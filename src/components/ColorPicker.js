@@ -66,12 +66,13 @@ class ColorPicker extends Component {
     super(props)
 
     const { colour } = props
-    this.state = { colour: colour }
+    this.state = { colour }
 
     this.handleChange = this.handleChange.bind(this)
   }
 
-  handleChange(colour) {
+  handleChange(option) {
+    const colour = option.value
     this.setState({ colour });
     const { onChange } = this.props
     onChange(colour)

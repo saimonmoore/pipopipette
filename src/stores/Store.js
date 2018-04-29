@@ -7,8 +7,10 @@ import Storage from '../lib/Storage.js'
 
 const storage = new Storage()
 
+const defaultGridSize = 5
+
 class Store {
-  grid_size = observable.box(5);
+  grid_size = observable.box(defaultGridSize);
   colour = observable.box("");
   dots = []
   lines = []
@@ -30,11 +32,21 @@ class Store {
 
   saveSession(session) {
     const grid_size = this.grid_size.get()
-    Object.assign(this.user, { grid_size })
-    Object.assign(this.user, session.user)
+    this.setGridSize(defaultGridSize)
+
+    if (!this.user.colour) {
+      this.setColour(this.assignRandomColour())
+    }
+
     Object.assign(this.session, session)
+    Object.assign(this.user, session.user)
 
     this.persistSession()
+  }
+
+  assignRandomColour() {
+    const colours = ["yellow", "red", "green", "blue", "orange", "brown", "pink"]
+    return colours[Math.floor(Math.random()*colours.length)];
   }
 
   clear() {
@@ -46,11 +58,13 @@ class Store {
   setGridSize(newSize) {
     this.clear()
     this.grid_size.set(newSize)
+    this.user.grid_size = newSize
     this.setup()
   }
 
   setColour(newColour) {
     this.colour.set(newColour)
+    this.user.colour = newColour
   }
 
   setup() {
