@@ -9,6 +9,7 @@ const storage = new Storage()
 
 class Store {
   grid_size = observable.box(5);
+  colour = observable.box("");
   dots = []
   lines = []
   boxes = []
@@ -46,6 +47,10 @@ class Store {
     this.clear()
     this.grid_size.set(newSize)
     this.setup()
+  }
+
+  setColour(newColour) {
+    this.colour.set(newColour)
   }
 
   setup() {

@@ -18,6 +18,7 @@ class App extends Component {
   constructor(props) {
     super(props)
 
+    this.state = { session: {} }
     this.initSession((session) => {
       store.saveSession(session)
       this.state = { session }
@@ -47,7 +48,7 @@ class App extends Component {
   login(session) {
     auth.login(this.getUserId(), (error, auth_user) => {
       if (!error) {
-        Object.assign(session.user, { auth_user })
+        Object.assign(session.user, { uid: auth_user.uid })
         this.saveSession(session)
       } else {
         alert(`Failed to login! (${JSON.stringify(error)})`)
