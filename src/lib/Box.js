@@ -13,15 +13,18 @@ class Box {
     })
   }
 
-  constructor({ topLeft, topRight, bottomLeft, bottomRight }) {
+  constructor({ topLeft, topRight, bottomLeft, bottomRight, user, colour }) {
     this.topLeft = topLeft
     this.topRight = topRight
     this.bottomLeft = bottomLeft
     this.bottomRight = bottomRight
 
-    this.closed = observable.box(false)
-    this.colour = observable.box("")
     this.user = {}
+    Object.assign(this.user, user || {})
+
+    this.closed = observable.box(false)
+    this.colour = colour ? colour : user && user.colour
+    this.colour = this.colour || ""
 
     this.edges = {
       topLeftTopRight: null,
@@ -106,6 +109,15 @@ class Box {
     return null
   }
 
+  setUser(user) {
+    this.user = user
+    this.setColour(user.colour)
+  }
+
+  setColour(colour) {
+    this.colour = colour
+  }
+
   addLine(line) {
     const edge = this.findEdgeForLine(line)
 
@@ -116,8 +128,7 @@ class Box {
 
     if (!this.closed.get() && this.isClosed()) {
       this.closed.set(true)
-      this.user = line.user
-      this.colour.set(line.user.colour)
+      this.setUser(line.user)
     }
   }
 
@@ -134,12 +145,10 @@ class Box {
 
   static unserialize(data) {
     const { coords, edges, user, closed, colour } = data
-    const box = new Box(coords)
+    const box = new Box(coords, user, colour)
 
     Object.assign(box.edges, edges)
-    box.user.set(user)
     box.closed.set(closed)
-    box.colour.set(colour)
 
     return box
   }
@@ -147,7 +156,8 @@ class Box {
 
 decorate(Box, {
   edges: observable,
-  user: observable
+  user: observable,
+  colour: observable
 })
 
 export default Box

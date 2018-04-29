@@ -63,12 +63,21 @@ class Store {
     this.colour.set(newColour)
     this.user.colour = newColour
     this.updateLineColour()
+    this.updateBoxColour()
   }
 
   updateLineColour() {
     this.lines.forEach((line) => {
       if (line.user.user_id === this.user.user_id) {
         line.setColour(this.user.colour)
+      }
+    })
+  }
+
+  updateBoxColour() {
+    this.boxes.forEach((box) => {
+      if (box.user.user_id === this.user.user_id) {
+        box.setColour(this.user.colour)
       }
     })
   }

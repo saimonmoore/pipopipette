@@ -10,11 +10,11 @@ class Line {
     })
   }
 
-  constructor({ fromDot, toDot, user }) {
+  constructor({ fromDot, toDot, user, colour }) {
     this.fromDot = fromDot;
     this.toDot = toDot;
     this.user = user
-    this.colour = user && user.colour
+    this.colour = colour ? colour : user && user.colour
 
     toDot.connect(fromDot)
     fromDot.connect(toDot)
@@ -54,19 +54,21 @@ class Line {
 
   serialize() {
     const [ fromCoords, toCoords ] = this.connection
-    const user = this.user
+    const user = toJS(this.user)
+    const colour = toJS(this.colour)
     const from = { column: fromCoords[0], row: fromCoords[1] }
     const to = { column: toCoords[0], row: toCoords[1] }
 
-    return { from, to, user }
+    return { from, to, user, colour }
   }
 
   static unserialize(data) {
     const from = new Dot(data.from)
     const to = new Dot(data.to)
-    const user = toJS(data.user)
+    const user = data.user
+    const colour = data.colour
 
-    return new Line(from, to, user)
+    return new Line(from, to, user, colour)
   }
 }
 

@@ -9,7 +9,6 @@ class Line extends Component {
 
     const from = line.fromDot
     const to = line.toDot
-    const user = line.user
     const colour = line.colour
 
     const offsets = {

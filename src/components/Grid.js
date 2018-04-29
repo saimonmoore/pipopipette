@@ -138,9 +138,12 @@ class Grid extends Component {
   }
 
   renderBox(box) {
+    const colour = box.colour
+
     return <BoxView
       key={box.id}
       box={box}
+      colour={colour}
     />
   }
 
