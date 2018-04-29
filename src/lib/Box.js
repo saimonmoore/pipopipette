@@ -20,7 +20,8 @@ class Box {
     this.bottomRight = bottomRight
 
     this.closed = observable.box(false)
-    this.user = observable.box("")
+    this.colour = observable.box("")
+    this.user = {}
 
     this.edges = {
       topLeftTopRight: null,
@@ -115,7 +116,8 @@ class Box {
 
     if (!this.closed.get() && this.isClosed()) {
       this.closed.set(true)
-      this.user.set(line.user)
+      this.user = line.user
+      this.colour.set(line.user.colour)
     }
   }
 
@@ -125,24 +127,27 @@ class Box {
     const edges = toJS(this.edges)
     const user = toJS(this.user)
     const closed = toJS(this.closed)
+    const colour = toJS(this.colour)
 
-    return { coords, edges, user, closed }
+    return { coords, edges, user, closed, colour }
   }
 
   static unserialize(data) {
-    const { coords, edges, user, closed } = data
+    const { coords, edges, user, closed, colour } = data
     const box = new Box(coords)
 
     Object.assign(box.edges, edges)
     box.user.set(user)
     box.closed.set(closed)
+    box.colour.set(colour)
 
     return box
   }
 }
 
 decorate(Box, {
-  edges: observable
+  edges: observable,
+  user: observable
 })
 
 export default Box

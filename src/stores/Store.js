@@ -19,7 +19,7 @@ class Store {
   session = {}
 
   constructor() {
-    this.setup()
+    this.setGridSize(defaultGridSize)
   }
 
   persistSession() {
@@ -31,9 +31,6 @@ class Store {
   }
 
   saveSession(session) {
-    const grid_size = this.grid_size.get()
-    this.setGridSize(defaultGridSize)
-
     if (!this.user.colour) {
       this.setColour(this.assignRandomColour())
     }
@@ -65,6 +62,15 @@ class Store {
   setColour(newColour) {
     this.colour.set(newColour)
     this.user.colour = newColour
+    this.updateLineColour()
+  }
+
+  updateLineColour() {
+    this.lines.forEach((line) => {
+      if (line.user.user_id === this.user.user_id) {
+        line.setColour(this.user.colour)
+      }
+    })
   }
 
   setup() {
@@ -108,6 +114,7 @@ class Store {
   }
 
   addLine(line) {
+    line.setUser(this.user)
     this.lines.push(line)
     const boxes = Box.findBoxes(line, this.boxes)
     boxes.forEach((box) => {

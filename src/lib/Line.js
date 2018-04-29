@@ -13,7 +13,8 @@ class Line {
   constructor({ fromDot, toDot, user }) {
     this.fromDot = fromDot;
     this.toDot = toDot;
-    this.user = user || "SM"
+    this.user = user
+    this.colour = user && user.colour
 
     toDot.connect(fromDot)
     fromDot.connect(toDot)
@@ -30,6 +31,15 @@ class Line {
 
   isConnected(coordinates) {
     return JSON.stringify(Line.sortConnection(coordinates)) === JSON.stringify(this.connection)
+  }
+
+  setUser(user) {
+    this.user = user
+    this.setColour(user.colour)
+  }
+
+  setColour(colour) {
+    this.colour = colour
   }
 
   static isAlreadyConnected(fromDot, toDot) {
@@ -64,6 +74,7 @@ decorate(Line, {
   fromDot: observable,
   toDot: observable,
   user: observable,
+  colour: observable,
 })
 
 export default Line

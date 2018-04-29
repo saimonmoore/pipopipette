@@ -44,7 +44,7 @@ class Dot extends Component {
                r={this.radius}
                stroke="green"
                strokeWidth="4"
-               fill="yellow"
+               fill="lightgrey"
                className={classNames}
                onClick={this.onClick}/>);
   }

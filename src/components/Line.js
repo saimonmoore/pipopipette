@@ -7,8 +7,10 @@ class Line extends Component {
   render() {
     const { line } = this.props
 
-    const from = line.fromDot;
+    const from = line.fromDot
     const to = line.toDot
+    const user = line.user
+    const colour = line.colour
 
     const offsets = {
       'top':  { x: 0, y: -20 },
@@ -21,10 +23,10 @@ class Line extends Component {
     const offsetTo = offsets[to.anchor] || { x: 0, y: 0 };
 
     return (
-      <g stroke="green" strokeWidth="5">
+      <g stroke={colour} strokeWidth="5">
         <path
           className="Line"
-          fill="green"
+          fill={colour} 
           strokeLinejoin="miter"
           d={`M ${from.x} ${from.y} L ${from.x + offsetFrom.x} ${from.y + offsetFrom.y} L ${to.x + offsetTo.x} ${to.y + offsetTo.y} L ${to.x} ${to.y}`}
         />
