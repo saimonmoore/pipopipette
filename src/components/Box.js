@@ -6,7 +6,7 @@ class Box extends Component {
     const user = box.user
     const colour = box.colour
     const user_id = user.user_id
-    const initials = user_id ? user_id.substring(0, 2).toUpperCase() : "✔"
+    const initials = colour ? colour.slice(-2).toUpperCase() : "✔"
 
     const hiddenStyles = { display: "none" }
     const visibleStyles = { display: "block" }

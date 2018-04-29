@@ -110,8 +110,10 @@ class Box {
   }
 
   setUser(user) {
-    this.user = user
-    this.setColour(user.colour)
+    Object.assign(this.user, user)
+    if (user.colour) {
+      this.setColour(user.colour)
+    }
   }
 
   setColour(colour) {
@@ -151,6 +153,21 @@ class Box {
     box.closed.set(closed)
 
     return box
+  }
+
+  static findBox(boxes, surrogate_box) {
+    return boxes.find((box) => {
+      return box.id === surrogate_box.id
+    })
+  }
+
+  static updateBox(boxes, surrogate_box) {
+    const box = Box.findBox(boxes, surrogate_box)
+    if (box) {
+      Object.assign(box.edges, surrogate_box.edges)
+      box.closed.set(surrogate_box.closed.get())
+      box.setUser(surrogate_box.user)
+    }
   }
 }
 

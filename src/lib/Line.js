@@ -63,12 +63,18 @@ class Line {
   }
 
   static unserialize(data) {
-    const from = new Dot(data.from)
-    const to = new Dot(data.to)
+    const fromDot = new Dot(data.from)
+    const toDot = new Dot(data.to)
     const user = data.user
     const colour = data.colour
 
-    return new Line(from, to, user, colour)
+    return new Line({ fromDot, toDot, user, colour })
+  }
+
+  static exists(lines, newLine) {
+    return !!lines.find((line) => {
+      return line.id === newLine.id
+    })
   }
 }
 

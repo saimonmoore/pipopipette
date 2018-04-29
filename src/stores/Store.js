@@ -1,6 +1,7 @@
 import { decorate, observable, toJS } from "mobx"
 
 import Dot from '../lib/Dot.js'
+import Line from '../lib/Line.js'
 import Box from '../lib/Box.js'
 import { range } from '../utils.js'
 import Storage from '../lib/Storage.js'
@@ -19,7 +20,45 @@ class Store {
   session = {}
 
   constructor() {
-    this.setGridSize(defaultGridSize)
+    this.handleLineAdded = this.handleLineAdded.bind(this)
+    this.handleBoxChanged = this.handleBoxChanged.bind(this)
+  }
+
+  handleLineAdded(data) {
+    const line = Line.unserialize(data)
+    if (!Line.exists(this.lines, line)) {
+      this.addLine(line, line.user)
+    }
+  }
+
+  handleBoxChanged(data) {
+    const box = Box.unserialize(data)
+    Box.updateBox(this.boxes, box)
+  }
+
+  async fetchData() {
+    const session_id = this.session.session.id
+    const user_id = this.user.user_id
+
+    const fetchDots = storage.getDots(session_id)
+    const fetchLines = storage.getLines(session_id)
+    const fetchBoxes = storage.getBoxes(session_id)
+    const fetchUser = storage.getUser(session_id, user_id)
+
+    const fetches = [fetchUser, fetchDots, fetchLines, fetchBoxes]
+    const responses = await Promise.all(fetches)
+
+    if (responses && typeof responses === 'object') {
+      const data = responses.map((snapshot) => {
+        if (!snapshot) return null
+        if (!snapshot.exists()) return false
+        return snapshot.val()
+      })
+
+      return { user: data[0], dots: data[1], lines: data[2], boxes: data[3] }
+    } else {
+      return { user: null, dots: [], lines: [], boxes: [] }
+    }
   }
 
   persistSession() {
@@ -38,7 +77,56 @@ class Store {
     Object.assign(this.session, session)
     Object.assign(this.user, session.user)
 
+    // Now we have a session, fetch the data
+    // If remote data, use that otherwise setup and persist
+    this.fetchData().then((data) => {
+      const { dots, lines, boxes } = data
+      if (!dots.length && !lines.length && !boxes.length) {
+        console.log("=====> Success but no data....setup : ")
+        this.setGridSize(defaultGridSize)
+      } else {
+        console.log("=====> Success and data....loading : ")
+        this.loadFromData(data)
+      }
+
+      this.enableRealTimeListeners()
+    }).catch((error) => {
+      console.log("=====> data fetch error: ", error)
+      this.setGridSize(defaultGridSize)
+    })
+
     this.persistSession()
+  }
+
+  enableRealTimeListeners() {
+    const session_id = this.session.session.id
+    storage.onLineAdded(session_id, this.handleLineAdded)
+    storage.onBoxChanged(session_id, this.handleBoxChanged)
+  }
+
+  disableRealTimeListeners() {
+    const session_id = this.session.session.id
+    storage.offLineAdded(session_id)
+    storage.offBoxChanged(session_id)
+  }
+
+  loadFromData(data) {
+    const { user, dots, lines, boxes } = data
+    Object.assign(this.user, user)
+    this.grid_size.set(user.grid_size || defaultGridSize)
+    this.colour.set(user.colour || "")
+
+    dots.forEach((dot) => {
+      this.addDot(Dot.unserialize(dot))
+    })
+
+    lines.forEach((line) => {
+      this.lines.push(Line.unserialize(line))
+    })
+
+    boxes.forEach((box) => {
+      this.addBox(Box.unserialize(box))
+    })
   }
 
   assignRandomColour() {
@@ -122,8 +210,8 @@ class Store {
     });
   }
 
-  addLine(line) {
-    line.setUser(this.user)
+  addLine(line, user) {
+    line.setUser(user || this.user)
     this.lines.push(line)
     const boxes = Box.findBoxes(line, this.boxes)
     boxes.forEach((box) => {

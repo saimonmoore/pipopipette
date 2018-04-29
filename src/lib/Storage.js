@@ -1,7 +1,5 @@
 import * as firebase from "firebase";
 
-import { to } from '../utils.js'
-
 const APP = "pipopipette"
 
 class Storage {
@@ -47,46 +45,66 @@ class Storage {
     this.storage().ref(`${APP}/${session_name}/boxes`).set(boxes);
   }
 
-  async getDots(session_name, fn) {
-    this.getArray(session_name, "dots", fn)
+  getDots(session_name) {
+    return this.getObject(session_name, "dots")
   }
 
-  async getLines(session_name, fn) {
-    this.getArray(session_name, "lines", fn)
+  getLines(session_name) {
+    return this.getObject(session_name, "lines")
   }
 
-  async getBoxes(session_name, fn) {
-    this.getArray(session_name, "boxes", fn)
+  getBoxes(session_name) {
+    return this.getObject(session_name, "boxes")
   }
 
-  async getArray(session_name, object, fn) {
-    let list = [];
-    let snapshot;
-    let error;
-
-    const ref = this.storage().ref(`${APP}/${session_name}/${object}`);
-    [error, snapshot] = await to(ref.once('value'));
-    if (error) return fn(error, null);
-
-    const response = Object.assign({}, snapshot.val());
-    list = response[object] || [];
-
-    fn(null, { list });
+  async getObject(session_name, object) {
+    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    return await ref.once('value')
   }
 
-  async getUser(session_name, user_id, fn) {
-    let user;
-    let snapshot;
-    let error;
-
+  async getUser(session_name, user_id) {
     const ref = this.storage().ref(`${APP}/${session_name}/users/user_${user_id}`);
-    [error, snapshot] = await to(ref.once('value'));
-    if (error) return fn(error, null);
+    return await ref.once('value')
+  }
 
-    const response = Object.assign({}, snapshot.val());
-    user = response.user
+  onBoxChanged(session_name, fn) {
+    this.onObjectChanged(session_name, "boxes", fn)
+  }
 
-    fn(null, { user });
+  offBoxChanged(session_name) {
+    this.offObjectChanged(session_name, "boxes")
+  }
+
+  onLineAdded(session_name, fn) {
+    this.onObjectAdded(session_name, "lines", fn)
+  }
+
+  offLineAdded(session_name) {
+    this.offObjectAdded(session_name, "lines")
+  }
+
+  onObjectAdded(session_name, object, fn) {
+    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    ref.on('child_added', (snapshot) => {
+      fn(snapshot.val())
+    })
+  }
+
+  onObjectChanged(session_name, object, fn) {
+    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    ref.on('child_changed', (snapshot) => {
+      fn(snapshot.val())
+    })
+  }
+
+  offObjectAdded(session_name, object) {
+    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    ref.off('child_added')
+  }
+
+  offObjectChanged(session_name, object) {
+    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    ref.off('child_changed')
   }
 }
 
