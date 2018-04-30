@@ -1,10 +1,11 @@
 import { decorate, observable, toJS } from "mobx"
 
 import Line from './Line.js'
+import Constants from "../constants.js"
 
 class Box {
   static getPixels(point) {
-    return point * 100 + 20 + 10
+    return point * Constants.dotSpacing + Constants.dotRadius + Constants.dotRadius * 0.5
   }
 
   static findBoxes(line, boxes) {

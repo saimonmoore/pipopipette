@@ -1,0 +1,17 @@
+.Player {
+}
+
+.Player.offline {
+  filter: grayscale(3) blur(3px);
+}
+
+.BottomPanel {
+  width: 200px;
+}
+
+.Score {
+  color: orange;
+  font-family: Verdana;
+  font-size: 20px;
+  font-weight: bold;
+}

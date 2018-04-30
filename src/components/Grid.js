@@ -5,6 +5,9 @@ import DotView from './Dot.js'
 import LineView from './Line.js'
 import BoxView from './Box.js'
 import Line from '../lib/Line.js'
+import Constants from "../constants.js"
+
+import "./Grid.css"
 
 class Grid extends Component {
   constructor(props) {
@@ -149,14 +152,14 @@ class Grid extends Component {
 
   render() {
     const { grid_size, dots, lines, boxes } = this.props
-    const width = grid_size.get() * 100, height = grid_size.get() * 100
+    const width = grid_size.get() * Constants.dotSpacing, height = grid_size.get() * Constants.dotSpacing
 
     const dot_views = dots.map((dot) => (this.renderDot(dot)))
     const line_views = lines.map((line) => (this.renderLine(line)))
     const box_views = boxes.map((box) => (this.renderBox(box)))
 
     return (
-      <div>
+      <div className="Grid">
         <svg
           ref="grid"
           width={width}

@@ -1,7 +1,8 @@
 import { decorate, observable, computed } from "mobx"
 
+import Constants from "../constants.js"
+
 class Dot {
-  radius = 20
   flashing = false
 
   constructor({ column=null, row=null } = {}) {
@@ -15,11 +16,11 @@ class Dot {
   }
 
   get x() {
-    return this.column * 100 + this.radius + 10
+    return this.column * Constants.dotSpacing + Constants.dotRadius + Constants.dotRadius * 0.5
   }
 
   get y() {
-    return this.row * 100 + this.radius + 10
+    return this.row * Constants.dotSpacing + Constants.dotRadius + Constants.dotRadius * 0.5
   }
 
   flash() {

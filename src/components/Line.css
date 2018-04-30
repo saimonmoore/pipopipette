@@ -1,7 +1,7 @@
 .Line {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: dash 3s linear forwards;
+  animation: dash 1s linear forwards;
 }
 
 @keyframes dash {

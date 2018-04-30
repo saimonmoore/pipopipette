@@ -4,8 +4,8 @@ import uniqid from "uniqid"
 
 import Store from './stores/Store.js'
 import Form from './components/Form.js'
+import Player from './components/Player.js'
 import Grid from './components/Grid.js'
-import logo from './logo.svg'
 import Auth from './lib/Auth.js'
 
 import './App.css'
@@ -124,15 +124,32 @@ class App extends Component {
   render() {
     const { session } = this.state
     const { grid_size, boxes, lines, dots } = store
+    const score1 = 0, score2 = 0
+    const online1 = true, online2 = 0
 
     return (
       <Provider store={store}>
         <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <Form session={session} />
+          <header className="Header">
+            <div className="Header-wrapper">
+              <div className="LeftPanel">
+                <Player player={1} score={score1} online={online1} session={session}/>
+              </div>
+              <div className="CentrePanel">
+                <Form session={session} />
+              </div>
+              <div className="RightPanel">
+                <Player player={2} score={score2} online={online2} session={session}/>
+              </div>
+            </div>
           </header>
-          <Grid grid_size={grid_size} dots={dots} lines={lines} boxes={boxes} />
+          <div className="App-wrapper">
+            <div className="LeftPanel"></div>
+            <div className="CentrePanel">
+              <Grid grid_size={grid_size} dots={dots} lines={lines} boxes={boxes} />
+            </div>
+            <div className="RightPanel"></div>
+          </div>
         </div>
       </Provider>
     );

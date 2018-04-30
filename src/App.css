@@ -7,11 +7,47 @@
   height: 80px;
 }
 
-.App-header {
+.Header {
   background-color: #222;
   height: 150px;
   padding: 20px;
   color: white;
+}
+
+.Header-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  align-content: space-between;
+  height: 100%;
+  width: 100%;
+}
+
+.App-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  align-content: space-between;
+  height: 100%;
+  width: 100%;
+
+  background-size: 50px 50px;
+  /* background-image: linear-gradient(to right, cyan 2px, transparent 1px), linear-gradient(to bottom, cyan 1px, transparent 1px); */
+  background-image: radial-gradient(circle, #61d60914 2px, rgba(0, 0, 0, 0) 55px);
+}
+
+.LeftPanel {
+}
+
+.CentrePanel {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.RightPanel {
 }
 
 .App-title {

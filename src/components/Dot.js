@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 
+import Constants from "../constants.js"
+
 import "./Dot.css"
 
 class Dot extends Component {
-  radius = 20
-
   constructor(props) {
     super(props)
 
@@ -25,12 +25,12 @@ class Dot extends Component {
 
   get x() {
     const { column } = this.state
-    return column * 100 + this.radius + 10
+    return column * Constants.dotSpacing + Constants.dotRadius + Constants.dotRadius * 0.5
   }
 
   get y() {
     const { row } = this.state
-    return row * 100 + this.radius + 10
+    return row * Constants.dotSpacing + Constants.dotRadius + Constants.dotRadius * 0.5
   }
 
   render() {
@@ -41,10 +41,10 @@ class Dot extends Component {
     return (<circle
                cx={this.x}
                cy={this.y}
-               r={this.radius}
-               stroke="green"
+               r={Constants.dotRadius}
+               stroke={Constants.dotStroke}
                strokeWidth="4"
-               fill="lightgrey"
+               fill={Constants.dotFill}
                className={classNames}
                onClick={this.onClick}/>);
   }

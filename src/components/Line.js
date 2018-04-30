@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 
+import Constants from "../constants.js"
 import "./Line.css"
 
 class Line extends Component {
@@ -12,10 +13,10 @@ class Line extends Component {
     const colour = line.colour
 
     const offsets = {
-      'top':  { x: 0, y: -20 },
-      'bottom':  { x: 0, y: 20 },
-      'left':  { x: -20, y: 0 },
-      'right':  { x: 20, y: 0 }
+      'top':  { x: 0, y: -Constants.dotRadius },
+      'bottom':  { x: 0, y: Constants.dotRadius },
+      'left':  { x: -Constants.dotRadius, y: 0 },
+      'right':  { x: Constants.dotRadius, y: 0 }
     }
 
     const offsetFrom = offsets[from.anchor] || { x: 0, y: 0 };

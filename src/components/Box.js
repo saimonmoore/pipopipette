@@ -5,8 +5,6 @@ class Box extends Component {
   renderBox(box, hide) {
     const user = box.user
     const colour = box.colour
-    const user_id = user.user_id
-    const initials = colour ? colour.slice(-2).toUpperCase() : "✔"
 
     const hiddenStyles = { display: "none" }
     const visibleStyles = { display: "block" }
@@ -15,9 +13,6 @@ class Box extends Component {
     return (
        <g stroke="red" strokeWidth="5" style={styles}>
         <polygon points={box.coordinates} fill={colour}/>
-        <text x={box.textXCoord} y={box.textYCoord} fontFamily="Verdana" fontSize="30" fontWeight="bold" stroke="none" fill="black">
-          {initials}
-        </text>
       </g>
     )
   }

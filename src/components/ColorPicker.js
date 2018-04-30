@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
+import './ColorPicker.css'
+
 class ColorOption extends Component {
   constructor(props) {
     super(props)
@@ -11,35 +13,34 @@ class ColorOption extends Component {
     this.handleMouseMove = this.handleMouseMove.bind(this)
   }
 
-	handleMouseDown(event) {
-		event.preventDefault();
-		event.stopPropagation();
-		this.props.onSelect(this.props.option, event);
-	}
+  handleMouseDown(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.props.onSelect(this.props.option, event);
+  }
 
-	handleMouseEnter(event) {
-		this.props.onFocus(this.props.option, event);
-	}
+  handleMouseEnter(event) {
+    this.props.onFocus(this.props.option, event);
+  }
 
-	handleMouseMove(event) {
-		if (this.props.isFocused) return;
-		this.props.onFocus(this.props.option, event);
-	}
+  handleMouseMove(event) {
+    if (this.props.isFocused) return;
+    this.props.onFocus(this.props.option, event);
+  }
 
   render() {
     const { option } = this.props
 
     return (
       <div
-				onMouseDown={this.handleMouseDown}
-				onMouseEnter={this.handleMouseEnter}
-				onMouseMove={this.handleMouseMove}      
+        onMouseDown={this.handleMouseDown}
+        onMouseEnter={this.handleMouseEnter}
+        onMouseMove={this.handleMouseMove}      
       >
-      <svg width="90" height="50" xmlns="http://www.w3.org/2000/svg">
-        <circle fill={option.value} cx="10" cy="10" r="10" />
-        <text x="10" y="15" fontFamily="Verdana" fontSize="10">{option.label}</text>
-      </svg>            
-      {this.props.children}
+        <svg width="100" height="60" xmlns="http://www.w3.org/2000/svg">
+          <circle fill={option.value} cx="20" cy="20" r="20" />
+        </svg>            
+        {this.props.children}
       </div>
     )
   }
@@ -49,14 +50,13 @@ class ColorValue extends Component {
   render() {
     const { value } = this.props
     const styles = {
-      marginLeft: "10px",
-      marginTop: "15px"
+      marginLeft: "50px",
+      marginTop: "25px"
     }
 
     return (
-      <svg width="70" height="20" xmlns="http://www.w3.org/2000/svg" style={styles}>
-        <circle fill={value.value} cx="10" cy="10" r="10" />
-        <text x="10" y="15" fontFamily="Verdana" fontSize="10">{value.label}</text>
+      <svg width="100" height="60" xmlns="http://www.w3.org/2000/svg" style={styles}>
+        <circle fill={value.value} cx="20" cy="20" r="20" />
       </svg>            
     )
   }
@@ -76,7 +76,6 @@ class ColorPicker extends Component {
     this.setState({ colour });
     const { onChange } = this.props
     onChange(colour)
-    console.log(`Selected: ${colour.label}`);
   }
 
   availableColors() {
@@ -91,22 +90,22 @@ class ColorPicker extends Component {
 
   render() {
     const { colour } = this.state
-    const wrapperStyles = {
-      maxWidth: '90px',
-    };
+    const wrapperStyles = {};
 
     return (
-      <Select 
-        name="colour"
-        value={colour}
-        onChange={this.handleChange}
-        autosize={false}
-        clearable={false}
-        options={this.options}
-        wrapperStyle={wrapperStyles}
-        optionComponent={ColorOption}
-        valueComponent={ColorValue}
-      />
+      <div className="ColorPicker">
+        <Select 
+          name="colour"
+          value={colour}
+          onChange={this.handleChange}
+          autosize={false}
+          clearable={false}
+          options={this.options}
+          wrapperStyle={wrapperStyles}
+          optionComponent={ColorOption}
+          valueComponent={ColorValue}
+        />
+      </div>
     )
   }
 } 

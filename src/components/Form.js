@@ -4,7 +4,6 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
 import { range } from '../utils.js'
-import ColorPicker from './ColorPicker.js'
 
 import "./Form.css"
 
@@ -15,7 +14,6 @@ class Form extends Component {
     super(props)
 
     this.handleGridSizeChange = this.handleGridSizeChange.bind(this);
-    this.handleColourChange = this.handleColourChange.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
   }
 
@@ -30,12 +28,6 @@ class Form extends Component {
     store.saveSession(session)
   }
 
-  handleColourChange(colour) {
-    const { store, session } = this.props
-    store.setColour(colour)
-    store.saveSession(session)
-  }
-
   gridSizeOptions() {
     return range(this.MAX_GRID_SIZE).map((size) => (
       { label: `${size} x ${size}`, name: size, value: size }
@@ -43,23 +35,16 @@ class Form extends Component {
   }
 
   render() {
-    const { grid_size, colour } = this.props.store
+    const { grid_size } = this.props.store
 
     return (
-      <div>
-        <form onSubmit={ this.handleOnSubmit } className="Form">
-          <label>
-            Color:
-            <ColorPicker colour={colour.get()} onChange={this.handleColourChange}/>
-          </label>
-          <label>
-            Grid size:
-            <Select
-              value={ grid_size.get() }
-              options={this.gridSizeOptions()}
-              clearable={false}
-              onChange={this.handleGridSizeChange} />
-          </label>
+      <div className="Form">
+        <form onSubmit={ this.handleOnSubmit }>
+          <Select
+            value={ grid_size.get() }
+            options={this.gridSizeOptions()}
+            clearable={false}
+            onChange={this.handleGridSizeChange} />
         </form>
       </div>
     );
