@@ -48,8 +48,9 @@ class App extends Component {
   login(session) {
     auth.login(this.getUserId(), (error, auth_user) => {
       if (!error) {
-        Object.assign(session.user, { uid: auth_user.uid })
-        this.saveSession(session)
+        // TODO: What do we need the uid for?
+        // Object.assign(session.user, { uid: auth_user.uid })
+        // this.saveSession(session)
       } else {
         alert(`Failed to login! (${JSON.stringify(error)})`)
       }
@@ -78,15 +79,14 @@ class App extends Component {
 
   createSession() {
     const session_id = this.session_id
-    const user_id = this.getUserId()
 
+    // Update location hash
     window.location.hash = session_id
 
     const session = {
       session: {
         id: session_id
-      },
-      user: { user_id }
+      }
     }
 
     this.saveSession(session)

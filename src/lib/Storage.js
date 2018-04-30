@@ -28,13 +28,14 @@ class Storage {
     return firebase.database();
   }
 
-  // e.g. grid_size, colour
-  setUser(session_name, user) {
-    this.storage().ref(`${APP}/${session_name}/users/user_${user.user_id}`).set(user);
+  // e.g. grid_size
+  setSession(session_name, session) {
+    this.storage().ref(`${APP}/${session_name}/session`).set(session);
   }
 
-  setDots(session_name, dots) {
-    this.storage().ref(`${APP}/${session_name}/dots`).set(dots);
+  // e.g. colour
+  setUser(session_name, user) {
+    this.storage().ref(`${APP}/${session_name}/users/user_${user.user_id}`).set(user);
   }
 
   setLines(session_name, lines) {
@@ -43,10 +44,6 @@ class Storage {
 
   setBoxes(session_name, boxes) {
     this.storage().ref(`${APP}/${session_name}/boxes`).set(boxes);
-  }
-
-  getDots(session_name) {
-    return this.getObject(session_name, "dots")
   }
 
   getLines(session_name) {
@@ -62,13 +59,23 @@ class Storage {
     return await ref.once('value')
   }
 
+  async getSession(session_name) {
+    const ref = this.storage().ref(`${APP}/${session_name}/session`);
+    return await ref.once('value')
+  }
+
   async getUser(session_name, user_id) {
     const ref = this.storage().ref(`${APP}/${session_name}/users/user_${user_id}`);
     return await ref.once('value')
   }
 
-  onGridSizeChanged(session_name, user_id, fn) {
-    const ref = this.storage().ref(`${APP}/${session_name}/users/user_${user_id}/grid_size`);
+  async getUsers(session_name) {
+    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    return await ref.once('value')
+  }
+
+  onGridSizeChanged(session_name, fn) {
+    const ref = this.storage().ref(`${APP}/${session_name}/session/grid_size`);
     ref.on('value', (snapshot) => {
       fn(snapshot.val())
     })
@@ -77,6 +84,20 @@ class Storage {
   onColourChanged(session_name, user_id, fn) {
     const ref = this.storage().ref(`${APP}/${session_name}/users/user_${user_id}/colour`);
     ref.on('value', (snapshot) => {
+      fn(snapshot.val())
+    })
+  }
+
+  onUserAdded(session_name, fn) {
+    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    ref.on('child_added', (snapshot) => {
+      fn(snapshot.val())
+    })
+  }
+
+  onUserChanged(session_name, fn) {
+    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    ref.on('child_changed', (snapshot) => {
       fn(snapshot.val())
     })
   }

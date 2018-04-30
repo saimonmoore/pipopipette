@@ -25,7 +25,7 @@ class Store {
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this)
     this.handleColourChanged = this.handleColourChanged.bind(this)
 
-    this.changeGridSize(Constants.defaultGridSize)
+    this.setDefaultGridSize()
   }
 
   handleLineAdded(data) {
@@ -69,11 +69,12 @@ class Store {
     const session_id = this.session.session.id
     const user_id = this.user.user_id
 
+    const fetchSession = storage.getSession(session_id)
     const fetchLines = storage.getLines(session_id)
     const fetchBoxes = storage.getBoxes(session_id)
     const fetchUser = storage.getUser(session_id, user_id)
 
-    const fetches = [fetchUser, fetchLines, fetchBoxes]
+    const fetches = [fetchSession, fetchUser, fetchLines, fetchBoxes]
     const responses = await Promise.all(fetches)
 
     if (responses && typeof responses === 'object') {
@@ -83,14 +84,15 @@ class Store {
         return snapshot.val()
       })
 
-      return { user: data[0], lines: data[1], boxes: data[2] }
+      return { session: data[0], user: data[1], lines: data[2], boxes: data[3] }
     } else {
-      return { user: null, lines: [], boxes: [] }
+      return { session: null, user: null, lines: [], boxes: [] }
     }
   }
 
   persistSession() {
     const session_id = this.session.session.id
+    storage.setSession(session_id, toJS(this.session))
     storage.setUser(session_id, toJS(this.user))
     storage.setLines(session_id, this.serialize(this.lines))
     storage.setBoxes(session_id, this.serialize(this.boxes))
@@ -112,8 +114,22 @@ class Store {
 
     // TODO: Enable loading indicator
     this.fetchData().then((data) => {
-      const { lines, boxes } = data
+      const { session, user, lines, boxes } = data
       const mustLoadData = lines.length || boxes.length
+
+      // Update the grid_size from the remote session
+      if (session) Object.assign(this.session, session)
+      if (session && (this.grid_size.get() !== session.grid_size) && (session.grid_size > Constants.minimumGridSize)) {
+        this.changeGridSize(session.grid_size)
+      }
+
+      // TODO: Only pull in info from other player
+      Object.assign(this.user, user)
+
+      // TODO: When players concept introduce update colour of other player
+      if (user.colour && user.colour.length) {
+        this.colour.set(user.colour)
+      }
 
       if (mustLoadData) {
         this.loadFromData(data)
@@ -132,8 +148,7 @@ class Store {
     const user_id = this.user.user_id
     storage.onLineAdded(session_id, this.handleLineAdded)
     storage.onBoxChanged(session_id, this.handleBoxChanged)
-    // TODO: Grid size should be stored in Game object
-    storage.onGridSizeChanged(session_id, user_id, this.handleGridSizeChanged)
+    storage.onGridSizeChanged(session_id, this.handleGridSizeChanged)
     storage.onColourChanged(session_id, user_id, this.handleColourChanged)
   }
 
@@ -145,15 +160,7 @@ class Store {
 
   loadFromData(data) {
     console.log("=====> loading from data...")
-    const { user, lines, boxes } = data
-
-    // TODO: Only pull in info from other player
-    Object.assign(this.user, user)
-
-    // TODO: When players concept introduce update colour of other player
-    if (user.colour && user.colour.length) {
-      this.colour.set(user.colour)
-    }
+    const { lines, boxes } = data
 
     if (lines && typeof lines === "object") {
       lines.forEach((line) => {
@@ -181,15 +188,20 @@ class Store {
 
   setGridSize(newSize) {
     this.grid_size.set(newSize)
-    this.user.grid_size = newSize
+    this.session.grid_size = newSize
+  }
+
+  setDefaultGridSize() {
+    this.clear()
+    this.setGridSize(Constants.defaultGridSize)
+    this.setup()
   }
 
   changeGridSize(newSize) {
     this.clear()
     this.setGridSize(newSize)
     this.setup()
-
-    if (this.session.session_id) this.persistSession()
+    this.persistSession()
   }
 
   changeColour(colour) {

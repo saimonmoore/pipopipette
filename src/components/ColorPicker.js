@@ -75,7 +75,11 @@ class ColorPicker extends Component {
     const { colour } = nextProps
     const previousColour = prevState.colour;
 
-    if (colour !== previousColour) return { colour }
+    if (colour !== previousColour) {
+      return { colour }
+    } else {
+      return null
+    }
   }
 
   handleChange(option) {
