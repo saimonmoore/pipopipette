@@ -22,6 +22,7 @@ class Store {
   constructor() {
     this.handleLineAdded = this.handleLineAdded.bind(this)
     this.handleBoxChanged = this.handleBoxChanged.bind(this)
+    this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this)
 
     this.changeGridSize(Constants.defaultGridSize)
   }
@@ -36,6 +37,25 @@ class Store {
   handleBoxChanged(data) {
     const box = Box.unserialize(data)
     Box.updateBox(this.boxes, box)
+  }
+
+  handleGridSizeChanged(grid_size) {
+    if (this.grid_size.get() !== grid_size) {
+      this.changeGridSize(grid_size)
+
+      this.fetchData().then((data) => {
+        const { lines, boxes } = data
+        const mustLoadData = lines.length || boxes.length
+
+        if (mustLoadData) {
+          this.loadFromData(data)
+        }
+
+        // TODO: Disable loading indicator
+      }).catch((error) => {
+        console.log("=====> data fetch error: ", error)
+      })
+    }
   }
 
   async fetchData() {
@@ -98,8 +118,10 @@ class Store {
 
   enableRealTimeListeners() {
     const session_id = this.session.session.id
+    const user_id = this.user.user_id
     storage.onLineAdded(session_id, this.handleLineAdded)
     storage.onBoxChanged(session_id, this.handleBoxChanged)
+    storage.onGridSizeChanged(session_id, user_id, this.handleGridSizeChanged)
   }
 
   disableRealTimeListeners() {
@@ -110,7 +132,7 @@ class Store {
 
   loadFromData(data) {
     console.log("=====> loading from data...")
-    const { user, lines, boxes } = data
+    const { lines, boxes } = data
 
     // TODO: Only pull in info from other player
     // Object.assign(this.user, user)
@@ -151,6 +173,8 @@ class Store {
     this.clear()
     this.setGridSize(newSize)
     this.setup()
+
+    if (this.session.session_id) this.persistSession()
   }
 
   setColour(newColour) {
