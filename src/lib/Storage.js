@@ -74,6 +74,13 @@ class Storage {
     })
   }
 
+  onColourChanged(session_name, user_id, fn) {
+    const ref = this.storage().ref(`${APP}/${session_name}/users/user_${user_id}/colour`);
+    ref.on('value', (snapshot) => {
+      fn(snapshot.val())
+    })
+  }
+
   onBoxChanged(session_name, fn) {
     this.onObjectChanged(session_name, "boxes", fn)
   }

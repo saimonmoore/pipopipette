@@ -71,6 +71,13 @@ class ColorPicker extends Component {
     this.handleChange = this.handleChange.bind(this)
   }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const { colour } = nextProps
+    const previousColour = prevState.colour;
+
+    if (colour !== previousColour) return { colour }
+  }
+
   handleChange(option) {
     const colour = option.value
     this.setState({ colour });

@@ -40,6 +40,7 @@ class Line {
 
   setColour(colour) {
     this.colour = colour
+    this.user.colour = colour
   }
 
   static isAlreadyConnected(fromDot, toDot) {

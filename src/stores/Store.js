@@ -23,6 +23,7 @@ class Store {
     this.handleLineAdded = this.handleLineAdded.bind(this)
     this.handleBoxChanged = this.handleBoxChanged.bind(this)
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this)
+    this.handleColourChanged = this.handleColourChanged.bind(this)
 
     this.changeGridSize(Constants.defaultGridSize)
   }
@@ -58,6 +59,12 @@ class Store {
     }
   }
 
+  handleColourChanged(colour) {
+    if (this.colour.get() !== colour) {
+      this.changeColour(colour)
+    }
+  }
+
   async fetchData() {
     const session_id = this.session.session.id
     const user_id = this.user.user_id
@@ -89,13 +96,19 @@ class Store {
     storage.setBoxes(session_id, this.serialize(this.boxes))
   }
 
+  firstTimeActions() {
+    const colour = this.user.colour
+    if (!colour || !colour.length) {
+      this.setColour(this.assignRandomColour())
+    }
+
+    this.persistSession()
+    this.enableRealTimeListeners()
+  }
+
   saveSession(session) {
     Object.assign(this.session, session)
     Object.assign(this.user, session.user)
-
-    if (!this.user.colour) {
-      this.setColour(this.assignRandomColour())
-    }
 
     // TODO: Enable loading indicator
     this.fetchData().then((data) => {
@@ -106,13 +119,11 @@ class Store {
         this.loadFromData(data)
       }
 
-      this.persistSession()
-      this.enableRealTimeListeners()
+      this.firstTimeActions()
       // TODO: Disable loading indicator
     }).catch((error) => {
       console.log("=====> data fetch error: ", error)
-      this.persistSession()
-      this.enableRealTimeListeners()
+      this.firstTimeActions()
     })
   }
 
@@ -121,7 +132,9 @@ class Store {
     const user_id = this.user.user_id
     storage.onLineAdded(session_id, this.handleLineAdded)
     storage.onBoxChanged(session_id, this.handleBoxChanged)
+    // TODO: Grid size should be stored in Game object
     storage.onGridSizeChanged(session_id, user_id, this.handleGridSizeChanged)
+    storage.onColourChanged(session_id, user_id, this.handleColourChanged)
   }
 
   disableRealTimeListeners() {
@@ -132,13 +145,15 @@ class Store {
 
   loadFromData(data) {
     console.log("=====> loading from data...")
-    const { lines, boxes } = data
+    const { user, lines, boxes } = data
 
     // TODO: Only pull in info from other player
-    // Object.assign(this.user, user)
+    Object.assign(this.user, user)
 
     // TODO: When players concept introduce update colour of other player
-    // this.colour.set(user.colour || "")
+    if (user.colour && user.colour.length) {
+      this.colour.set(user.colour)
+    }
 
     if (lines && typeof lines === "object") {
       lines.forEach((line) => {
@@ -175,6 +190,15 @@ class Store {
     this.setup()
 
     if (this.session.session_id) this.persistSession()
+  }
+
+  changeColour(colour) {
+    this.setColour(colour)
+  }
+
+  saveColour(colour) {
+    this.setColour(colour)
+    this.persistSession()
   }
 
   setColour(newColour) {

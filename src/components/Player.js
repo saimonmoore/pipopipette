@@ -20,9 +20,8 @@ class Player extends Component {
   }
 
   handleColourChange(colour) {
-    const { store, session } = this.props
-    store.setColour(colour)
-    store.saveSession(session)
+    const { store } = this.props
+    store.saveColour(colour)
   }
 
   renderPlayerAvatar(player, online, colour) {
