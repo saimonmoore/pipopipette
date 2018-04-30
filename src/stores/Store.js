@@ -6,12 +6,12 @@ import Box from '../lib/Box.js'
 import { range } from '../utils.js'
 import Storage from '../lib/Storage.js'
 
+import Constants from "../constants.js"
+
 const storage = new Storage()
 
-const defaultGridSize = 5
-
 class Store {
-  grid_size = observable.box(defaultGridSize);
+  grid_size = observable.box(Constants.defaultGridSize);
   colour = observable.box("");
   dots = []
   lines = []
@@ -22,6 +22,8 @@ class Store {
   constructor() {
     this.handleLineAdded = this.handleLineAdded.bind(this)
     this.handleBoxChanged = this.handleBoxChanged.bind(this)
+
+    this.changeGridSize(Constants.defaultGridSize)
   }
 
   handleLineAdded(data) {
@@ -40,12 +42,11 @@ class Store {
     const session_id = this.session.session.id
     const user_id = this.user.user_id
 
-    const fetchDots = storage.getDots(session_id)
     const fetchLines = storage.getLines(session_id)
     const fetchBoxes = storage.getBoxes(session_id)
     const fetchUser = storage.getUser(session_id, user_id)
 
-    const fetches = [fetchUser, fetchDots, fetchLines, fetchBoxes]
+    const fetches = [fetchUser, fetchLines, fetchBoxes]
     const responses = await Promise.all(fetches)
 
     if (responses && typeof responses === 'object') {
@@ -55,47 +56,44 @@ class Store {
         return snapshot.val()
       })
 
-      return { user: data[0], dots: data[1], lines: data[2], boxes: data[3] }
+      return { user: data[0], lines: data[1], boxes: data[2] }
     } else {
-      return { user: null, dots: [], lines: [], boxes: [] }
+      return { user: null, lines: [], boxes: [] }
     }
   }
 
   persistSession() {
     const session_id = this.session.session.id
     storage.setUser(session_id, toJS(this.user))
-    storage.setDots(session_id, this.serialize(this.dots))
     storage.setLines(session_id, this.serialize(this.lines))
     storage.setBoxes(session_id, this.serialize(this.boxes))
   }
 
   saveSession(session) {
+    Object.assign(this.session, session)
+    Object.assign(this.user, session.user)
+
     if (!this.user.colour) {
       this.setColour(this.assignRandomColour())
     }
 
-    Object.assign(this.session, session)
-    Object.assign(this.user, session.user)
-
-    // Now we have a session, fetch the data
-    // If remote data, use that otherwise setup and persist
+    // TODO: Enable loading indicator
     this.fetchData().then((data) => {
-      const { dots, lines, boxes } = data
-      if (!dots.length && !lines.length && !boxes.length) {
-        console.log("=====> Success but no data....setup : ")
-        this.setGridSize(defaultGridSize)
-      } else {
-        console.log("=====> Success and data....loading : ")
+      const { lines, boxes } = data
+      const mustLoadData = lines.length || boxes.length
+
+      if (mustLoadData) {
         this.loadFromData(data)
       }
 
+      this.persistSession()
       this.enableRealTimeListeners()
+      // TODO: Disable loading indicator
     }).catch((error) => {
       console.log("=====> data fetch error: ", error)
-      this.setGridSize(defaultGridSize)
+      this.persistSession()
+      this.enableRealTimeListeners()
     })
-
-    this.persistSession()
   }
 
   enableRealTimeListeners() {
@@ -111,22 +109,26 @@ class Store {
   }
 
   loadFromData(data) {
-    const { user, dots, lines, boxes } = data
-    Object.assign(this.user, user)
-    this.grid_size.set(user.grid_size || defaultGridSize)
-    this.colour.set(user.colour || "")
+    console.log("=====> loading from data...")
+    const { user, lines, boxes } = data
 
-    dots.forEach((dot) => {
-      this.addDot(Dot.unserialize(dot))
-    })
+    // TODO: Only pull in info from other player
+    // Object.assign(this.user, user)
 
-    lines.forEach((line) => {
-      this.lines.push(Line.unserialize(line))
-    })
+    // TODO: When players concept introduce update colour of other player
+    // this.colour.set(user.colour || "")
 
-    boxes.forEach((box) => {
-      this.addBox(Box.unserialize(box))
-    })
+    if (lines && typeof lines === "object") {
+      lines.forEach((line) => {
+        this.lines.push(Line.unserialize(line))
+      })
+    }
+
+    if (boxes && typeof boxes === "object") {
+      boxes.forEach((data) => {
+        this.handleBoxChanged(data)
+      })
+    }
   }
 
   assignRandomColour() {
@@ -141,9 +143,13 @@ class Store {
   }
 
   setGridSize(newSize) {
-    this.clear()
     this.grid_size.set(newSize)
     this.user.grid_size = newSize
+  }
+
+  changeGridSize(newSize) {
+    this.clear()
+    this.setGridSize(newSize)
     this.setup()
   }
 
@@ -171,12 +177,19 @@ class Store {
   }
 
   setup() {
+    this.setupDots()
+    this.setupBoxes()
+  }
+
+  setupDots() {
     range(this.grid_size.get()).forEach((column) => (
       range(this.grid_size.get()).forEach((row) => {
         this.createDot({column, row})
       })
     ))
+  }
 
+  setupBoxes() {
     // We create N-1 x N-1 boxes from a N x N node grid
     range(this.grid_size.get() - 1).forEach((row) => {
       range(this.grid_size.get() - 1).forEach((column) => {

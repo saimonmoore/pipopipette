@@ -3,7 +3,6 @@ import { inject, observer } from "mobx-react";
 
 class Box extends Component {
   renderBox(box, hide) {
-    const user = box.user
     const colour = box.colour
 
     const hiddenStyles = { display: "none" }

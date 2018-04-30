@@ -24,7 +24,7 @@ class Form extends Component {
   handleGridSizeChange(option) {
     const grid_size = parseInt(option.value, 10) || 0
     const { store, session } = this.props
-    store.setGridSize(grid_size)
+    store.changeGridSize(grid_size)
     store.saveSession(session)
   }
 
