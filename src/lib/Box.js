@@ -148,10 +148,10 @@ class Box {
     const { coords, edges, closed, colour } = data
     let player;
 
-    if (data.player && (data.player.user_id === player1)) player = player1
-    if (data.player && (data.player.user_id === player2)) player = player2
+    if (data.player && (data.player.user_id === player1.id)) player = player1
+    if (data.player && (data.player.user_id === player2.id)) player = player2
 
-    const box = new Box(coords, player, colour)
+    const box = new Box(Object.assign({player, colour}, coords))
     Object.assign(box.edges, edges)
     box.closed.set(closed)
 
@@ -169,6 +169,7 @@ class Box {
     if (box) {
       Object.assign(box.edges, surrogate_box.edges)
       box.closed.set(surrogate_box.closed.get())
+      box.setColour(surrogate_box.colour)
       box.setPlayer(surrogate_box.player)
     }
   }

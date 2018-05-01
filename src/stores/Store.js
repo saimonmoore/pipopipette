@@ -1,4 +1,4 @@
-import { decorate, observable, toJS } from "mobx"
+import { decorate, observable, toJS, computed } from "mobx"
 
 import Dot from '../lib/Dot.js'
 import Line from '../lib/Line.js'
@@ -13,6 +13,8 @@ const storage = new Storage()
 
 class Store {
   grid_size = observable.box(Constants.defaultGridSize);
+  turn = observable.box(Constants.firstTurn);
+  running = observable.box(false);
   dots = []
   lines = []
   boxes = []

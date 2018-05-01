@@ -13,7 +13,6 @@ class Player {
     this.user_id = user_id
     this.colour = colour
     this.player = 1
-    this.score = 0
   }
 
   get id() {
@@ -22,10 +21,6 @@ class Player {
 
   setColour(colour) {
     this.colour = colour
-  }
-
-  setScore(score) {
-    this.score = score
   }
 
   setPlayer(player) {
@@ -46,7 +41,6 @@ class Player {
 
 decorate(Player, {
   colour: observable,
-  score: observable,
   player: observable,
 })
 

@@ -5,4 +5,5 @@ export default {
   dotSpacing: 150,
   dotStroke: "#61d609",
   dotFill: "lightgray",
+  firstTurn: 1,
 }

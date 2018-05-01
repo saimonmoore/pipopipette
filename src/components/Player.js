@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { decorate, computed } from "mobx"
 import { inject, observer } from "mobx-react";
 
 import ColorPicker from './ColorPicker.js'
@@ -31,12 +32,35 @@ class Player extends Component {
     return (<span><img src={img} alt="Player {playerNumber}" className={classNames} /></span>)
   }
 
+  scorePlayer(player) {
+    if (!player) return 0
+
+    const { boxes } = this.props.store
+
+    return boxes.reduce((sum, box) => {
+      if (!box.player) return sum
+      if (box.player.id !== player.id) return sum
+      if (box.closed && box.closed.get()) sum += 1
+      return sum
+    }, 0)
+  }
+
+  get scorePlayer1() {
+    const { player1 } = this.props.store
+    return this.scorePlayer(player1)
+  }
+
+  get scorePlayer2() {
+    const { player2 } = this.props.store
+    return this.scorePlayer(player2)
+  }
+
   render() {
     const { player } = this.props
     const colour = player.colour
-    const score = player.score
     const playerNumber = player && player.player
     const isPlayer2 = playerNumber === 2
+    const score = isPlayer2 ? this.scorePlayer2 : this.scorePlayer1
 
     return (
       <div className="Player">
@@ -64,5 +88,10 @@ class Player extends Component {
     );
   }
 }
+
+decorate(Player, {
+  scorePlayer1: computed,
+  scorePlayer2: computed,
+})
 
 export default inject("store")(observer(Player));
