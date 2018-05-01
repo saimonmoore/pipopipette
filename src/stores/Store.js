@@ -1,4 +1,4 @@
-import { decorate, observable, toJS, computed } from "mobx"
+import { decorate, observable, toJS } from "mobx"
 
 import Dot from '../lib/Dot.js'
 import Line from '../lib/Line.js'
@@ -13,8 +13,8 @@ const storage = new Storage()
 
 class Store {
   grid_size = observable.box(Constants.defaultGridSize);
-  turn = observable.box(Constants.firstTurn);
-  running = observable.box(false);
+  turn = observable.box("");
+  status = observable.box("waiting");
   dots = []
   lines = []
   boxes = []
@@ -85,6 +85,7 @@ class Store {
       this.player2 = player
 
       this.setColour(this.player2, player.colour)
+      this.status.set("running")
     }
   }
 
@@ -138,9 +139,12 @@ class Store {
   }
 
   saveSession(session) {
+
     Object.assign(this.session, session)
+
     Object.assign(this.user, session.user)
     this.player1 = new Player(this.user)
+    this.session.turn = this.player1.id
 
     // TODO: Enable loading indicator
     this.fetchData().then((data) => {
@@ -148,9 +152,18 @@ class Store {
       const mustLoadData = lines.length || boxes.length
 
       // Update the grid_size from the remote session
-      if (session) Object.assign(this.session, session)
-      if (session && (this.grid_size.get() !== session.grid_size) && (session.grid_size > Constants.minimumGridSize)) {
-        this.changeGridSize(session.grid_size)
+      if (session) {
+        Object.assign(this.session, session)
+
+        if ((this.grid_size.get() !== session.grid_size) && (session.grid_size > Constants.minimumGridSize)) {
+          this.changeGridSize(session.grid_size)
+        }
+
+        if (session.turn) {
+          this.turn.set(session.turn)
+        } else {
+          this.turn.set(this.player1.id)
+        }
       }
 
       // Load players
@@ -312,14 +325,24 @@ class Store {
     });
   }
 
+  setTurn(player, boxClosed) {
+    if (boxClosed) return
+
+    const nextTurn = player.id === this.player1.id ? this.player2.id : this.player1.id
+    this.turn.set(nextTurn)
+    this.session.turn = this.turn.get()
+  }
+
   addLine(line, player) {
+    let boxClosed;
     line.setPlayer(player || this.player1)
     this.lines.push(line)
     const boxes = Box.findBoxes(line, this.boxes)
     boxes.forEach((box) => {
-      box.addLine(line)
+      boxClosed = box.addLine(line)
     })
 
+    this.setTurn(player || this.player1, boxClosed)
     this.persistSession()
   }
 

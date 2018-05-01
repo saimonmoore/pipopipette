@@ -32,10 +32,8 @@ class Player extends Component {
     return (<span><img src={img} alt="Player {playerNumber}" className={classNames} /></span>)
   }
 
-  scorePlayer(player) {
+  static scorePlayer(player, boxes) {
     if (!player) return 0
-
-    const { boxes } = this.props.store
 
     return boxes.reduce((sum, box) => {
       if (!box.player) return sum
@@ -46,13 +44,43 @@ class Player extends Component {
   }
 
   get scorePlayer1() {
-    const { player1 } = this.props.store
-    return this.scorePlayer(player1)
+    const { store } = this.props
+    const { player1, boxes } = store
+    return Player.scorePlayer(player1, boxes)
   }
 
   get scorePlayer2() {
-    const { player2 } = this.props.store
-    return this.scorePlayer(player2)
+    const { store } = this.props
+    const { player2, boxes } = store
+    return Player.scorePlayer(player2, boxes)
+  }
+
+  get turnLabel() {
+    const { player } = this.props
+    const playerNumber = player && player.player
+    const { turn, player1, player2 } = this.props.store
+    let turnLabel;
+    
+    if (!turn.get()) return ""
+    if (!player1) return ""
+
+    if ((turn.get() === player1.id) && playerNumber === 1) {
+      return "Player 1's turn"
+    }
+
+    if ((turn.get() === player1.id) && playerNumber === 2) {
+      return ""
+    }
+
+    if (!player2) return "Player 1's turn"
+
+    if ((turn.get() === player2.id) && playerNumber === 2) {
+      return "Player 2's turn"
+    }
+
+    if ((turn.get() === player2.id) && playerNumber === 1) {
+      return ""
+    }
   }
 
   render() {
@@ -83,6 +111,10 @@ class Player extends Component {
           <div className="Score">
             <span>Score: {score}</span>
           </div>
+
+          <div className="Turn">
+            <span>{this.turnLabel}</span>
+          </div>
         </div>
       </div>
     );
@@ -92,6 +124,7 @@ class Player extends Component {
 decorate(Player, {
   scorePlayer1: computed,
   scorePlayer2: computed,
+  turnLabel: computed,
 })
 
 export default inject("store")(observer(Player));

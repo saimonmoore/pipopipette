@@ -92,7 +92,8 @@ class Grid extends Component {
 
   onDotClick (dot) {
     const store = this.props.store
-    const user = "LM" // Comes from user
+    const { turn, player1 } = store
+    const player = player1
 
     let line
 
@@ -105,8 +106,8 @@ class Grid extends Component {
       const valid = Line.valid({ fromDot, toDot });
       if (!valid) toDot.flash()
 
-      if (valid) {
-        line = new Line({ fromDot, toDot, user })
+      if (valid && turn.get() === player.id) {
+        line = new Line({ fromDot, toDot, player })
         store.addLine(line)
       }
       this.setState({

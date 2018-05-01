@@ -122,15 +122,19 @@ class Box {
   addLine(line) {
     const edge = this.findEdgeForLine(line)
 
-    if (!edge) return
-    if (!!this.edges[edge]) return
+    if (!edge) return null
+    if (!!this.edges[edge]) return null
 
     this.edges[edge] = line.connection
 
     if (!this.closed.get() && this.isClosed()) {
       this.closed.set(true)
       this.setPlayer(line.player)
+
+      return true
     }
+
+    return null
   }
 
   serialize() {

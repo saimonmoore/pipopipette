@@ -1,0 +1,20 @@
+.GameOver {
+}
+
+.GameOver a {
+  cursor: pointer
+}
+
+.GameOver button {
+  border: "0px";
+  font-size: "20px";
+  margin-top: "100px";
+  background-color: "#e6e378";
+}
+
+.GameOver button.hover {
+  border: "0px";
+  font-size: "20px";
+  margin-top: "100px";
+  background-color: "#ccc96a";
+}
