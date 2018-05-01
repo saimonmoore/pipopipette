@@ -3,6 +3,7 @@ import { Provider, observer } from "mobx-react"
 import uniqid from "uniqid"
 
 import Store from './stores/Store.js'
+import WaitingForPlayer from './components/WaitingForPlayer.js'
 import Form from './components/Form.js'
 import Player from './components/Player.js'
 import Grid from './components/Grid.js'
@@ -39,7 +40,7 @@ class App extends Component {
         }
       })
     } else {
-      window.location.hash = session.session.id
+      window.location.hash = session.session_id
       this.login(session)
       fn(session)
     }
@@ -79,14 +80,14 @@ class App extends Component {
 
   createSession() {
     const session_id = this.session_id
+    const user_id = this.getUserId()
 
     // Update location hash
     window.location.hash = session_id
 
     const session = {
-      session: {
-        id: session_id
-      }
+      session_id,
+      user: { user_id }
     }
 
     this.saveSession(session)
@@ -123,23 +124,22 @@ class App extends Component {
 
   render() {
     const { session } = this.state
-    const { grid_size, boxes, lines, dots } = store
-    const score1 = 0, score2 = 0
-    const online1 = true, online2 = 0
+    const { grid_size, boxes, lines, dots, player1, player2 } = store
 
     return (
       <Provider store={store}>
         <div className="App">
+          <WaitingForPlayer />
           <header className="Header">
             <div className="Header-wrapper">
               <div className="LeftPanel">
-                <Player player={1} score={score1} online={online1} session={session}/>
+                <Player player={player1} session={session}/>
               </div>
               <div className="CentrePanel">
                 <Form session={session} />
               </div>
               <div className="RightPanel">
-                <Player player={2} score={score2} online={online2} session={session}/>
+                <Player player={player2} session={session}/>
               </div>
             </div>
           </header>

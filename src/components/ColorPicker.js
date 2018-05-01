@@ -101,6 +101,7 @@ class ColorPicker extends Component {
 
   render() {
     const { colour } = this.state
+    const { disabled } = this.props
     const wrapperStyles = {};
 
     return (
@@ -115,6 +116,7 @@ class ColorPicker extends Component {
           wrapperStyle={wrapperStyles}
           optionComponent={ColorOption}
           valueComponent={ColorValue}
+          disabled={disabled}
         />
       </div>
     )

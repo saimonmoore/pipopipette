@@ -25,30 +25,34 @@ class Player extends Component {
   }
 
   renderPlayerAvatar(player, online, colour) {
-    const classNames = online ? "Player" : "Player offline"
-    const img = (player === 1) ? leftAvatarImg : rightAvatarImg
-    // TODO: Round semi-transparent circle of colour
-    const styles = { }
-
-    return (<span style={styles}><img src={img} alt="Player {player}" className={classNames} /></span>)
+    const classNames = player ? "Player" : "Player offline"
+    const playerNumber = player && player.player
+    const img = (playerNumber === 1) ? leftAvatarImg : rightAvatarImg
+    return (<span><img src={img} alt="Player {playerNumber}" className={classNames} /></span>)
   }
 
   render() {
-    const { colour } = this.props.store
-    const { player, online, score } = this.props
+    const { player } = this.props
+    const colour = player.colour
+    const score = player.score
+    const playerNumber = player && player.player
+    const isPlayer2 = playerNumber === 2
 
     return (
       <div className="Player">
         <div className="LeftPanel">
           <div className="TopPanel">
             <div className="Avatar">
-              { this.renderPlayerAvatar(player, online, colour) }
+              { this.renderPlayerAvatar(player, colour) }
             </div>
           </div>
           <div className="BottomPanel">
-            <form onSubmit={ this.handleOnSubmit }>
-              <ColorPicker colour={colour.get()} onChange={this.handleColourChange}/>
-            </form>
+            { 
+               player.colour &&
+               <form onSubmit={ this.handleOnSubmit }>
+                 <ColorPicker colour={colour} disabled={isPlayer2} onChange={this.handleColourChange}/>
+               </form>
+             }
           </div>
         </div>
         <div className="RightPanel">

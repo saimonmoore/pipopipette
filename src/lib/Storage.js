@@ -69,7 +69,7 @@ class Storage {
     return await ref.once('value')
   }
 
-  async getUsers(session_name) {
+  async getPlayers(session_name) {
     const ref = this.storage().ref(`${APP}/${session_name}/users`);
     return await ref.once('value')
   }
@@ -81,23 +81,16 @@ class Storage {
     })
   }
 
-  onColourChanged(session_name, user_id, fn) {
-    const ref = this.storage().ref(`${APP}/${session_name}/users/user_${user_id}/colour`);
-    ref.on('value', (snapshot) => {
-      fn(snapshot.val())
-    })
-  }
-
-  onUserAdded(session_name, fn) {
+  onPlayerAdded(session_name, fn) {
     const ref = this.storage().ref(`${APP}/${session_name}/users`);
     ref.on('child_added', (snapshot) => {
       fn(snapshot.val())
     })
   }
 
-  onUserChanged(session_name, fn) {
+  onPlayerRemoved(session_name, fn) {
     const ref = this.storage().ref(`${APP}/${session_name}/users`);
-    ref.on('child_changed', (snapshot) => {
+    ref.on('child_removed', (snapshot) => {
       fn(snapshot.val())
     })
   }

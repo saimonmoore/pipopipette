@@ -14,17 +14,15 @@ class Box {
     })
   }
 
-  constructor({ topLeft, topRight, bottomLeft, bottomRight, user, colour }) {
+  constructor({ topLeft, topRight, bottomLeft, bottomRight, player, colour }) {
     this.topLeft = topLeft
     this.topRight = topRight
     this.bottomLeft = bottomLeft
     this.bottomRight = bottomRight
 
-    this.user = {}
-    Object.assign(this.user, user || {})
-
+    this.player = player
     this.closed = observable.box(false)
-    this.colour = colour ? colour : user && user.colour
+    this.colour = colour ? colour : player && player.colour
     this.colour = this.colour || ""
 
     this.edges = {
@@ -110,10 +108,10 @@ class Box {
     return null
   }
 
-  setUser(user) {
-    Object.assign(this.user, user)
-    if (user.colour) {
-      this.setColour(user.colour)
+  setPlayer(player) {
+    this.player = player
+    if (player && player.colour) {
+      this.setColour(player.colour)
     }
   }
 
@@ -131,7 +129,7 @@ class Box {
 
     if (!this.closed.get() && this.isClosed()) {
       this.closed.set(true)
-      this.setUser(line.user)
+      this.setPlayer(line.player)
     }
   }
 
@@ -139,17 +137,21 @@ class Box {
     const { topLeft, topRight, bottomLeft, bottomRight } = this
     const coords = { topLeft, topRight, bottomLeft, bottomRight }
     const edges = toJS(this.edges)
-    const user = toJS(this.user)
+    const player = this.player ? this.player.serialize() : null
     const closed = toJS(this.closed)
     const colour = toJS(this.colour)
 
-    return { coords, edges, user, closed, colour }
+    return { coords, edges, player, closed, colour }
   }
 
-  static unserialize(data) {
-    const { coords, edges, user, closed, colour } = data
-    const box = new Box(coords, user, colour)
+  static unserialize(data, player1, player2) {
+    const { coords, edges, closed, colour } = data
+    let player;
 
+    if (data.player && (data.player.user_id === player1)) player = player1
+    if (data.player && (data.player.user_id === player2)) player = player2
+
+    const box = new Box(coords, player, colour)
     Object.assign(box.edges, edges)
     box.closed.set(closed)
 
@@ -167,14 +169,14 @@ class Box {
     if (box) {
       Object.assign(box.edges, surrogate_box.edges)
       box.closed.set(surrogate_box.closed.get())
-      box.setUser(surrogate_box.user)
+      box.setPlayer(surrogate_box.player)
     }
   }
 }
 
 decorate(Box, {
   edges: observable,
-  user: observable,
+  player: observable,
   colour: observable
 })
 

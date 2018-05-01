@@ -3,6 +3,7 @@ import { decorate, observable, toJS } from "mobx"
 import Dot from '../lib/Dot.js'
 import Line from '../lib/Line.js'
 import Box from '../lib/Box.js'
+import Player from '../lib/Player.js'
 import { range } from '../utils.js'
 import Storage from '../lib/Storage.js'
 
@@ -12,10 +13,11 @@ const storage = new Storage()
 
 class Store {
   grid_size = observable.box(Constants.defaultGridSize);
-  colour = observable.box("");
   dots = []
   lines = []
   boxes = []
+  player1 = {}
+  player2 = {}
   user = {}
   session = {}
 
@@ -23,20 +25,22 @@ class Store {
     this.handleLineAdded = this.handleLineAdded.bind(this)
     this.handleBoxChanged = this.handleBoxChanged.bind(this)
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this)
-    this.handleColourChanged = this.handleColourChanged.bind(this)
+    this.handlePlayerAdded = this.handlePlayerAdded.bind(this)
+    this.handlePlayerRemoved = this.handlePlayerRemoved.bind(this)
 
+    this.player1 = new Player(this.user)
     this.setDefaultGridSize()
   }
 
   handleLineAdded(data) {
-    const line = Line.unserialize(data)
+    const line = Line.unserialize(data, this.player1, this.player2)
     if (!Line.exists(this.lines, line)) {
-      this.addLine(line, line.user)
+      this.addLine(line, line.player)
     }
   }
 
   handleBoxChanged(data) {
-    const box = Box.unserialize(data)
+    const box = Box.unserialize(data, this.player1, this.player2)
     Box.updateBox(this.boxes, box)
   }
 
@@ -59,22 +63,45 @@ class Store {
     }
   }
 
-  handleColourChanged(colour) {
-    if (this.colour.get() !== colour) {
-      this.changeColour(colour)
+  handlePlayerChanged(data) {
+    const player = new Player(data)
+    if (Player.isPlayerTwo(player, this.player1)) {
+      player.setPlayer(2)
+
+      if (this.player.colour.get() !== player.colour) {
+        this.setColour(player, player.colour)
+      }
+
+      this.player2 = player
     }
   }
 
+  handlePlayerAdded(data) {
+    const player = new Player(data)
+    if (Player.isPlayerTwo(player, this.player1)) {
+      player.setPlayer(2)
+      this.player2 = player
+
+      this.setColour(this.player2, player.colour)
+    }
+  }
+
+  handlePlayerRemoved(data) {
+    const player = new Player(data)
+    if (Player.isPlayerTwo(player, this.player1)) this.player2 = null
+  }
+
   async fetchData() {
-    const session_id = this.session.session.id
-    const user_id = this.user.user_id
+    const session_id = this.session.session_id
+    const user_id = this.player1.id
 
     const fetchSession = storage.getSession(session_id)
     const fetchLines = storage.getLines(session_id)
     const fetchBoxes = storage.getBoxes(session_id)
     const fetchUser = storage.getUser(session_id, user_id)
+    const fetchPlayers = storage.getPlayers(session_id)
 
-    const fetches = [fetchSession, fetchUser, fetchLines, fetchBoxes]
+    const fetches = [fetchSession, fetchUser, fetchLines, fetchBoxes, fetchPlayers]
     const responses = await Promise.all(fetches)
 
     if (responses && typeof responses === 'object') {
@@ -84,24 +111,24 @@ class Store {
         return snapshot.val()
       })
 
-      return { session: data[0], user: data[1], lines: data[2], boxes: data[3] }
+      return { session: data[0], user: data[1], lines: data[2], boxes: data[3], players: data[4] }
     } else {
-      return { session: null, user: null, lines: [], boxes: [] }
+      return { session: null, user: null, lines: [], boxes: [], players: [] }
     }
   }
 
   persistSession() {
-    const session_id = this.session.session.id
+    const session_id = this.session.session_id
     storage.setSession(session_id, toJS(this.session))
-    storage.setUser(session_id, toJS(this.user))
+    storage.setUser(session_id, this.player1.serialize())
     storage.setLines(session_id, this.serialize(this.lines))
     storage.setBoxes(session_id, this.serialize(this.boxes))
   }
 
   firstTimeActions() {
-    const colour = this.user.colour
+    const colour = this.player1.colour
     if (!colour || !colour.length) {
-      this.setColour(this.assignRandomColour())
+      this.player1.setColour(this.assignRandomColour())
     }
 
     this.persistSession()
@@ -111,10 +138,11 @@ class Store {
   saveSession(session) {
     Object.assign(this.session, session)
     Object.assign(this.user, session.user)
+    this.player1 = new Player(this.user)
 
     // TODO: Enable loading indicator
     this.fetchData().then((data) => {
-      const { session, user, lines, boxes } = data
+      const { session, lines, boxes, players } = data
       const mustLoadData = lines.length || boxes.length
 
       // Update the grid_size from the remote session
@@ -123,13 +151,18 @@ class Store {
         this.changeGridSize(session.grid_size)
       }
 
-      // TODO: Only pull in info from other player
-      Object.assign(this.user, user)
+      // Load players
+      players && Object.values(players).forEach((data) =>{
+        const player = new Player(data)
+        if (Player.isPlayerOne(player, this.player1)) {
+          this.player1 = new Player(player)
+        }
 
-      // TODO: When players concept introduce update colour of other player
-      if (user.colour && user.colour.length) {
-        this.colour.set(user.colour)
-      }
+        if (Player.isPlayerTwo(player, this.player1)) {
+          player.setPlayer(2)
+          this.player2 = player
+        }
+      })
 
       if (mustLoadData) {
         this.loadFromData(data)
@@ -144,16 +177,16 @@ class Store {
   }
 
   enableRealTimeListeners() {
-    const session_id = this.session.session.id
-    const user_id = this.user.user_id
+    const session_id = this.session.session_id
     storage.onLineAdded(session_id, this.handleLineAdded)
     storage.onBoxChanged(session_id, this.handleBoxChanged)
     storage.onGridSizeChanged(session_id, this.handleGridSizeChanged)
-    storage.onColourChanged(session_id, user_id, this.handleColourChanged)
+    storage.onPlayerAdded(session_id, this.handlePlayerAdded)
+    storage.onPlayerRemoved(session_id, this.handlePlayerRemoved)
   }
 
   disableRealTimeListeners() {
-    const session_id = this.session.session.id
+    const session_id = this.session.session_id
     storage.offLineAdded(session_id)
     storage.offBoxChanged(session_id)
   }
@@ -164,7 +197,7 @@ class Store {
 
     if (lines && typeof lines === "object") {
       lines.forEach((line) => {
-        this.lines.push(Line.unserialize(line))
+        this.lines.push(Line.unserialize(line, this.player1, this.player2))
       })
     }
 
@@ -204,34 +237,28 @@ class Store {
     this.persistSession()
   }
 
-  changeColour(colour) {
-    this.setColour(colour)
-  }
-
   saveColour(colour) {
-    this.setColour(colour)
+    this.setColour(this.player1, colour)
     this.persistSession()
   }
 
-  setColour(newColour) {
-    this.colour.set(newColour)
-    this.user.colour = newColour
-    this.updateLineColour()
-    this.updateBoxColour()
+  setColour(player, newColour) {
+    this.updateLineColour(player, newColour)
+    this.updateBoxColour(player, newColour)
   }
 
-  updateLineColour() {
+  updateLineColour(player, colour) {
     this.lines.forEach((line) => {
-      if (line.user.user_id === this.user.user_id) {
-        line.setColour(this.user.colour)
+      if (line.player && (line.player.id === player.id)) {
+        line.setColour(colour)
       }
     })
   }
 
-  updateBoxColour() {
+  updateBoxColour(player, colour) {
     this.boxes.forEach((box) => {
-      if (box.user.user_id === this.user.user_id) {
-        box.setColour(this.user.colour)
+      if (box.player && (box.player.id === player.id)) {
+        box.setColour(colour)
       }
     })
   }
@@ -283,8 +310,8 @@ class Store {
     });
   }
 
-  addLine(line, user) {
-    line.setUser(user || this.user)
+  addLine(line, player) {
+    line.setPlayer(player || this.player1)
     this.lines.push(line)
     const boxes = Box.findBoxes(line, this.boxes)
     boxes.forEach((box) => {
@@ -319,6 +346,8 @@ decorate(Store, {
   dots: observable,
   lines: observable,
   boxes: observable,
+  player1: observable,
+  player2: observable,
   user: observable,
   session: observable,
 })
