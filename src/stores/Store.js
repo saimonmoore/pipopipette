@@ -24,6 +24,7 @@ class Store {
   session = {}
 
   constructor() {
+    console.log("[Store#constructor]...")
     this.handleLineAdded = this.handleLineAdded.bind(this)
     this.handleBoxChanged = this.handleBoxChanged.bind(this)
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this)
@@ -31,28 +32,41 @@ class Store {
     this.handlePlayerRemoved = this.handlePlayerRemoved.bind(this)
 
     this.player1 = new Player(this.user)
+    console.log("[Store#constructor]...about to set default grid size")
     this.setDefaultGridSize()
+    console.log("[Store#constructor]...set default grid size")
   }
 
   handleLineAdded(data) {
+    console.log("[Store#handleLineAdded]...data: ", JSON.stringify(data))
     const line = Line.unserialize(data, this.player1, this.player2)
     if (!Line.exists(this.lines, line)) {
+      console.log("[Store#handleLineAdded]...line doesn't already exist...adding line ")
       this.addLine(line, line.player)
+      console.log("[Store#handleLineAdded]...line doesn't already exist...added line ")
     }
   }
 
   handleBoxChanged(data) {
+    console.log("[Store#handleBoxChanged]...data: ", JSON.stringify(data))
     const box = Box.unserialize(data, this.player1, this.player2)
+    console.log("[Store#handleBoxChanged]...box: ", box && JSON.stringify(box))
     Box.updateBox(this.boxes, box)
+    console.log("[Store#handleBoxChanged]...called Box.updateBox")
   }
 
   handleGridSizeChanged(grid_size) {
+    console.log("[Store#handleGridSizeChanged]...grid_size: ", grid_size)
     if (this.grid_size.get() !== grid_size) {
+      console.log("[Store#handleGridSizeChanged]...changing grid_size: ", this.grid_size.get(), grid_size)
       this.changeGridSize(grid_size)
+      console.log("[Store#handleGridSizeChanged]...changed grid_size...now fetching data...")
 
       this.fetchData().then((data) => {
+        console.log("[Store#handleGridSizeChanged]...in fetchData#fn...")
         const { lines, boxes } = data
         const mustLoadData = lines.length || boxes.length
+        console.log("[Store#handleGridSizeChanged]...in fetchData#fn... mustLoadData: ", mustLoadData)
 
         if (mustLoadData) {
           this.loadFromData(data)
@@ -60,12 +74,13 @@ class Store {
 
         // TODO: Disable loading indicator
       }).catch((error) => {
-        console.log("=====> data fetch error: ", error)
+        console.log("[Store#handleGridSizeChanged]...error fetchData... error: ", JSON.stringify(error))
       })
     }
   }
 
   handlePlayerChanged(data) {
+    console.log("[Store#handlePlayerChanged]...data: ", JSON.stringify(data))
     const player = new Player(data)
     if (Player.isPlayerTwo(player, this.player1)) {
       player.setPlayer(2)
@@ -75,6 +90,7 @@ class Store {
       }
 
       this.player2 = player
+      console.log("[Store#handlePlayerChanged]...was player 2: ", JSON.stringify(this.player2))
     }
   }
 
@@ -98,11 +114,16 @@ class Store {
   }
 
   handlePlayerRemoved(data) {
+    console.log("[Store#handlePlayerRemoved]...data: ", JSON.stringify(data))
     const player = new Player(data)
-    if (Player.isPlayerTwo(player, this.player1)) this.player2 = null
+    if (Player.isPlayerTwo(player, this.player1)) {
+      this.player2 = null
+      console.log("[Store#handlePlayerRemoved]...was player2...destroyed")
+    }
   }
 
   async fetchData() {
+    console.log("[Store#fetchData]...")
     const session_id = this.session.session_id
     const user_id = this.player1.id
 
@@ -122,31 +143,41 @@ class Store {
         return snapshot.val()
       })
 
+      console.log("[Store#fetchData]... returning data...")
       return { session: data[0], user: data[1], lines: data[2], boxes: data[3], players: data[4] }
     } else {
+      console.log("[Store#fetchData]... returning no data...")
       return { session: null, user: null, lines: [], boxes: [], players: [] }
     }
   }
 
   persistSession() {
+    console.log("[Store#persistSession]...") 
     const session_id = this.session.session_id
     storage.setSession(session_id, toJS(this.session))
     storage.setUser(session_id, this.player1.serialize())
     storage.setLines(session_id, this.serialize(this.lines))
     storage.setBoxes(session_id, this.serialize(this.boxes))
+    console.log("[Store#persistSession]... done") 
   }
 
   firstTimeActions() {
+    console.log("[Store#firstTimeActions]...") 
     const colour = this.player1.colour
     if (!colour || !colour.length) {
+      console.log("[Store#firstTimeActions]...assigning random colour to player1") 
       this.player1.setColour(this.assignRandomColour())
     }
 
+    console.log("[Store#firstTimeActions]...persisting session") 
     this.persistSession()
+    console.log("[Store#firstTimeActions]...enabling real time listeners") 
     this.enableRealTimeListeners()
+    console.log("[Store#firstTimeActions]...done") 
   }
 
   saveSession(session) {
+    console.log("[Store#saveSession]...session: ", JSON.stringify(session)) 
 
     Object.assign(this.session, session)
 
@@ -154,40 +185,58 @@ class Store {
     this.player1 = new Player(this.user)
     this.session.turn = this.player1.id
 
+    console.log("[Store#saveSession]...about to call `fetchData` session: ", JSON.stringify(session)) 
     // TODO: Enable loading indicator
     this.fetchData().then((data) => {
       const { session, lines, boxes, players } = data
       const mustLoadData = lines.length || boxes.length
+      console.log("[Store#saveSession]...in `fetchData#fn` mustLoadData: ", mustLoadData) 
 
       // Update the grid_size from the remote session
       if (session) {
         Object.assign(this.session, session)
+        console.log("[Store#saveSession]...in `fetchData#fn` got session: ", JSON.stringify(session)) 
 
         if ((this.grid_size.get() !== session.grid_size) && (session.grid_size > Constants.minimumGridSize)) {
+          console.log("[Store#saveSession]...in `fetchData#fn` changing grid_size to: ", session.grid_size) 
           this.changeGridSize(session.grid_size)
         }
 
         if (session.turn) {
+          console.log("[Store#saveSession]...in `fetchData#fn` got turn from session...setting to: ", session.turn) 
           this.turn.set(session.turn)
         } else {
+          console.log("[Store#saveSession]...in `fetchData#fn` didn't get turn from session...setting to player 1's turn: ", this.player1.id) 
           this.turn.set(this.player1.id)
+        }
+
+        if (session.status) {
+          console.log("[Store#saveSession]...in `fetchData#fn` got status from session...setting to: ", session.status) 
+          this.status.set(session.status)
+        } else {
+          console.log("[Store#saveSession]...in `fetchData#fn` didn't get status from session...setting to `waiting `") 
+          this.status.set("waiting")
         }
       }
 
       // Load players
+      console.log("[Store#saveSession]...in `fetchData#fn` loading players...") 
       players && Object.values(players).forEach((data) =>{
         const player = new Player(data)
         if (Player.isPlayerOne(player, this.player1)) {
           this.player1 = new Player(player)
+          console.log("[Store#saveSession]...in `fetchData#fn` loading player 1: ", JSON.stringify(data), JSON.stringify(this.player1)) 
         }
 
         if (Player.isPlayerTwo(player, this.player1)) {
           player.setPlayer(2)
           this.player2 = player
+          console.log("[Store#saveSession]...in `fetchData#fn` loading player 2: ", JSON.stringify(data), JSON.stringify(this.player2)) 
         }
       })
 
       if (mustLoadData) {
+        console.log("[Store#saveSession]...in `fetchData#fn` loading data") 
         this.loadFromData(data)
       }
 
@@ -195,6 +244,7 @@ class Store {
       // TODO: Disable loading indicator
     }).catch((error) => {
       console.log("=====> data fetch error: ", error)
+      console.log("[Store#saveSession]...error `fetchData` error: ", JSON.stringify(error)) 
       this.firstTimeActions()
     })
   }
@@ -215,7 +265,7 @@ class Store {
   }
 
   loadFromData(data) {
-    console.log("=====> loading from data...")
+    console.log("[Store#loadFromData]...") 
     const { lines, boxes } = data
 
     if (lines && typeof lines === "object") {
@@ -256,21 +306,29 @@ class Store {
   }
 
   setDefaultGridSize() {
+    console.log("[Store#setDefaultGridSize]...") 
     this.clear()
     this.setGridSize(Constants.defaultGridSize)
     this.setup()
+    console.log("[Store#setDefaultGridSize]...done") 
   }
 
   changeGridSize(newSize) {
+    console.log("[Store#changeGridSize]...") 
     this.clear()
     this.setGridSize(newSize)
     this.setup()
+    console.log("[Store#changeGridSize]...done setup") 
     this.persistSession()
+    console.log("[Store#changeGridSize]...done") 
   }
 
   saveColour(colour) {
+    console.log("[Store#saveColour]...colour: ", colour) 
     this.setColour(this.player1, colour)
+    console.log("[Store#saveColour]...done...persisting") 
     this.persistSession()
+    console.log("[Store#saveColour]...done") 
   }
 
   setColour(player, newColour) {
@@ -365,6 +423,7 @@ class Store {
   }
 
   addLine(line, player) {
+    console.log("[Store#addLine]...line: ", JSON.stringify(line), player && JSON.stringify(player)) 
     let boxClosed;
     line.setPlayer(player || this.player1)
     this.lines.push(line)
@@ -382,6 +441,7 @@ class Store {
 
     console.log("[Store#addLine]...done...persisting session") 
     this.persistSession()
+    console.log("[Store#addLine]...done") 
   }
 
   removeLine(line) {
