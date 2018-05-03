@@ -78,14 +78,22 @@ class Store {
     }
   }
 
+  gameOver() {
+    return this.status.get() === "game_over"
+  }
+
   handlePlayerAdded(data) {
+    console.log("[Store#handlePlayerAdded]...data: ", JSON.stringify(data))
+    if (this.gameOver()) return
+    console.log("[Store#handlePlayerAdded]...not game over...")
     const player = new Player(data)
     if (Player.isPlayerTwo(player, this.player1)) {
       player.setPlayer(2)
       this.player2 = player
 
       this.setColour(this.player2, player.colour)
-      this.status.set("running")
+      this.setStatus("running")
+      console.log("[Store#handlePlayerAdded]...was player 2...game now running...")
     }
   }
 
@@ -221,6 +229,14 @@ class Store {
         this.handleBoxChanged(data)
       })
     }
+
+    if (this.hasWon()) {
+      console.log("[Store#loadFromData]...has won! GAME OVER!") 
+      this.setStatus("game_over")
+      this.persistSession()
+    }
+
+    console.log("[Store#loadFromData]...done") 
   }
 
   assignRandomColour() {
@@ -333,6 +349,21 @@ class Store {
     this.session.turn = this.turn.get()
   }
 
+  setStatus(newStatus) {
+    console.log("[Store#setStatus]...newStatus: ", newStatus) 
+    this.status.set(newStatus)
+    this.session.status = this.status.get()
+    console.log("[Store#setStatus]...done", this.status.get(), this.session.status) 
+  }
+
+  hasWon() {
+    const won = this.boxes.every((box) => {
+      return box.closed.get()
+    })
+    console.log("[Store#hasWon]...won: ", won) 
+    return won
+  }
+
   addLine(line, player) {
     let boxClosed;
     line.setPlayer(player || this.player1)
@@ -343,6 +374,13 @@ class Store {
     })
 
     this.setTurn(player || this.player1, boxClosed)
+
+    if (this.hasWon()) {
+      this.setStatus("game_over")
+      this.persistSession()
+    }
+
+    console.log("[Store#addLine]...done...persisting session") 
     this.persistSession()
   }
 

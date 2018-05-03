@@ -7,7 +7,7 @@ import Modal from './Modal.js'
 
 import "./GameOver.css"
 
-class GameOver extends Component 
+class GameOver extends Component  {
   constructor(props) {
     super(props)
 
@@ -20,13 +20,13 @@ class GameOver extends Component
   }
 
   get scorePlayer1() {
-    const { player1 } = this.props.store
-    return Player.scorePlayer(player1)
+    const { player1, boxes } = this.props.store
+    return Player.scorePlayer(player1, boxes)
   }
 
   get scorePlayer2() {
-    const { player2 } = this.props.store
-    return Player.scorePlayer(player2)
+    const { player2, boxes } = this.props.store
+    return Player.scorePlayer(player2, boxes)
   }
 
   get scoreWinningPlayer() {
@@ -46,14 +46,14 @@ class GameOver extends Component
 
   render() {
     const { status } = this.props.store
-    const show = status === 'game_over'
+    const show = status.get() === 'game_over'
 
     return (
       <Modal show={show} onClose={this.onClose} closable={false}>
         <div className="GameOver">
           <h2>
             Game over
-          </p>
+          </h2>
 
           <p>
             Congratulations player {this.winningPlayer}! You win! ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)

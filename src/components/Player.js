@@ -34,6 +34,8 @@ class Player extends Component {
 
   static scorePlayer(player, boxes) {
     if (!player) return 0
+    if (!boxes) return 0
+    if (boxes && !typeof boxes === "object") return 0
 
     return boxes.reduce((sum, box) => {
       if (!box.player) return sum
@@ -57,10 +59,11 @@ class Player extends Component {
 
   get turnLabel() {
     const { player } = this.props
+    const { status } = this.props.store
     const playerNumber = player && player.player
     const { turn, player1, player2 } = this.props.store
-    let turnLabel;
     
+    if (status.get() === "game_over") return ""
     if (!turn.get()) return ""
     if (!player1) return ""
 

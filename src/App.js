@@ -4,6 +4,7 @@ import uniqid from "uniqid"
 
 import Store from './stores/Store.js'
 import WaitingForPlayer from './components/WaitingForPlayer.js'
+import GameOver from './components/GameOver.js'
 import Form from './components/Form.js'
 import Player from './components/Player.js'
 import Grid from './components/Grid.js'
@@ -130,6 +131,7 @@ class App extends Component {
       <Provider store={store}>
         <div className="App">
           <WaitingForPlayer />
+          <GameOver />
           <header className="Header">
             <div className="Header-wrapper">
               <div className="LeftPanel">

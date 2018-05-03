@@ -24,7 +24,8 @@ class WaitingForPlayer extends Component {
       <Modal show={showWaitingForPlayer} onClose={this.onClose} closable={false}>
         <div className="WaitingForPlayer">
           <p>
-            This is Pipopipette. A simple game where each player has to
+            This is Pipopipette.
+            A simple <a href="https://en.wikipedia.org/wiki/Dots_and_Boxes" target="_blank" rel="noopener noreferrer">game</a> where each player has to
             connect dots with lines and win the game by completing boxes.
           </p>
 
