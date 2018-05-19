@@ -21,7 +21,7 @@ class Line {
   }
 
   get id() {
-    return `from:${this.fromDot.id}|to:${this.toDot.id}`
+    return this.connection.join("-")
   }
 
   // Ensures always left -> right and top -> bottom
