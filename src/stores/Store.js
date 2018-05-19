@@ -284,9 +284,15 @@ class Store {
       console.log("[Store#loadFromData]...has won! GAME OVER!") 
       this.setStatus("game_over")
       this.persistSession()
+      this.destroySession()
     }
 
     console.log("[Store#loadFromData]...done") 
+  }
+
+  destroySession() {
+    console.log("[Store#destroySession] destroying session...")
+    sessionStorage.removeItem("pipopipette_session")
   }
 
   assignRandomColour() {

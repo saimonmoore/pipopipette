@@ -30,37 +30,56 @@ class App extends Component {
     })
   }
 
+  // Session without firebase authentication
   initSession(fn) {
     console.log("[App#initSession] ===> ...looking for session")
     let session = this.session()
 
     if (!session) {
       console.log("[App#initSession] ===> ...no session found....about to call #signup")
-      this.signup((error) => {
-        console.log("[App#initSession] ===> ...in signup#fn ...")
-        if (error) {
-          console.log("[App#initSession] ===> ...in signup#fn error! ", JSON.stringify(error))
-          alert(`Failed to signup! (${JSON.stringify(error)})`)
-        } else {
-          console.log("[App#initSession] ===> ...in signup#fn...creating session ")
-          session = this.createSession()
-          console.log("[App#initSession] ===> ...in signup#fn...created session: ", JSON.stringify(session))
-          console.log("[App#initSession] ===> ...in signup#fn...about to login...")
-          this.login(session)
-          console.log("[App#initSession] ===> ...in signup#fn...logged in...about to call outer fn with session")
-          fn(session)
-        }
-      })
+      session = this.createSession()
+      console.log("[App#initSession] ===> ...created session: ", JSON.stringify(session))
+      fn(session)
     } else {
       console.log("[App#initSession] ===> ...found session:", JSON.stringify(session))
       window.location.hash = session.session_id
       console.log("[App#initSession] ===> ...set location hash to:", window.location.hash)
-      console.log("[App#initSession] ===> ...about to login...")
-      this.login(session)
-      console.log("[App#initSession] ===> ...logged in...about to call outer fn with session")
       fn(session)
     }
   }
+
+  // Session with firebase authentication
+  // initSession(fn) {
+  //   console.log("[App#initSession] ===> ...looking for session")
+  //   let session = this.session()
+
+  //   if (!session) {
+  //     console.log("[App#initSession] ===> ...no session found....about to call #signup")
+  //     this.signup((error) => {
+  //       console.log("[App#initSession] ===> ...in signup#fn ...")
+  //       if (error) {
+  //         console.log("[App#initSession] ===> ...in signup#fn error! ", JSON.stringify(error))
+  //         alert(`Failed to signup! (${JSON.stringify(error)})`)
+  //       } else {
+  //         console.log("[App#initSession] ===> ...in signup#fn...creating session ")
+  //         session = this.createSession()
+  //         console.log("[App#initSession] ===> ...in signup#fn...created session: ", JSON.stringify(session))
+  //         console.log("[App#initSession] ===> ...in signup#fn...about to login...")
+  //         this.login(session)
+  //         console.log("[App#initSession] ===> ...in signup#fn...logged in...about to call outer fn with session")
+  //         fn(session)
+  //       }
+  //     })
+  //   } else {
+  //     console.log("[App#initSession] ===> ...found session:", JSON.stringify(session))
+  //     window.location.hash = session.session_id
+  //     console.log("[App#initSession] ===> ...set location hash to:", window.location.hash)
+  //     console.log("[App#initSession] ===> ...about to login...")
+  //     this.login(session)
+  //     console.log("[App#initSession] ===> ...logged in...about to call outer fn with session")
+  //     fn(session)
+  //   }
+  // }
 
   login(session) {
     console.log("[App#login] ===> ...with session:", JSON.stringify(session))
@@ -103,7 +122,7 @@ class App extends Component {
 
   saveSession(session) {
     console.log("[App#saveSession] saving session to sessionStorage: ", JSON.stringify(session))
-    sessionStorage.setItem("session", JSON.stringify(session))
+    sessionStorage.setItem("pipopipette_session", JSON.stringify(session))
   }
 
   createSession() {
@@ -136,7 +155,7 @@ class App extends Component {
   session() {
     let session
     try {
-      session = JSON.parse(sessionStorage.getItem("session"))
+      session = JSON.parse(sessionStorage.getItem("pipopipette_session"))
       console.log("[App#session] session: ", JSON.stringify(session))
       return session
     } catch(err) {
