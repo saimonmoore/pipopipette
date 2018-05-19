@@ -66,19 +66,18 @@ class Player extends Component {
     if (status.get() === "game_over") return ""
     if (!turn.get()) return ""
     if (!player1) return ""
+    if (!player2) return "Your turn"
 
     if ((turn.get() === player1.id) && playerNumber === 1) {
-      return "Player 1's turn"
+      return "Your turn"
     }
 
     if ((turn.get() === player1.id) && playerNumber === 2) {
       return ""
     }
 
-    if (!player2) return "Player 1's turn"
-
     if ((turn.get() === player2.id) && playerNumber === 2) {
-      return "Player 2's turn"
+      return "Their turn"
     }
 
     if ((turn.get() === player2.id) && playerNumber === 1) {
