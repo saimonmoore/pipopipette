@@ -31,6 +31,7 @@ class Store {
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this)
     this.handlePlayerAdded = this.handlePlayerAdded.bind(this)
     this.handlePlayerRemoved = this.handlePlayerRemoved.bind(this)
+    this.handlePlayerChanged = this.handlePlayerChanged.bind(this)
 
     this.player1 = new Player(this.user)
     console.log("[Store#constructor]...about to set default grid size")
@@ -259,6 +260,7 @@ class Store {
     storage.onGridSizeChanged(session_id, this.handleGridSizeChanged)
     storage.onPlayerAdded(session_id, this.handlePlayerAdded)
     storage.onPlayerRemoved(session_id, this.handlePlayerRemoved)
+    storage.onPlayerChanged(session_id, this.handlePlayerChanged)
   }
 
   disableRealTimeListeners() {
@@ -334,6 +336,7 @@ class Store {
 
   saveColour(colour) {
     console.log("[Store#saveColour]...colour: ", colour) 
+    this.player1.setColour(colour)
     this.setColour(this.player1, colour)
     console.log("[Store#saveColour]...done...persisting") 
     this.persistSession()

@@ -95,6 +95,13 @@ class Storage {
     })
   }
 
+  onPlayerChanged(session_name, fn) {
+    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    ref.on('child_changed', (snapshot) => {
+      fn(snapshot.val())
+    })
+  }
+
   onBoxChanged(session_name, fn) {
     this.onObjectChanged(session_name, "boxes", fn)
   }
