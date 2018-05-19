@@ -11,6 +11,7 @@ import Constants from "../constants.js"
 
 const storage = new Storage()
 
+console.log("=====================> TOJS:" , toJS)
 class Store {
   grid_size = observable.box(Constants.defaultGridSize);
   turn = observable.box("");
@@ -50,7 +51,7 @@ class Store {
   handleBoxChanged(data) {
     console.log("[Store#handleBoxChanged]...data: ", JSON.stringify(data))
     const box = Box.unserialize(data, this.player1, this.player2)
-    console.log("[Store#handleBoxChanged]...box: ", box && JSON.stringify(box))
+    console.log("[Store#handleBoxChanged]...box: ", box && JSON.stringify(toJS(box)))
     Box.updateBox(this.boxes, box)
     console.log("[Store#handleBoxChanged]...called Box.updateBox")
   }
@@ -90,7 +91,7 @@ class Store {
       }
 
       this.player2 = player
-      console.log("[Store#handlePlayerChanged]...was player 2: ", JSON.stringify(this.player2))
+      console.log("[Store#handlePlayerChanged]...was player 2: ", JSON.stringify(toJS(this.player2)))
     }
   }
 
@@ -227,13 +228,13 @@ class Store {
         const player = new Player(data)
         if (Player.isPlayerOne(player, this.player1)) {
           this.player1 = new Player(player)
-          console.log("[Store#saveSession]...in `fetchData#fn` loading player 1: ", JSON.stringify(data), JSON.stringify(this.player1)) 
+          console.log("[Store#saveSession]...in `fetchData#fn` loading player 1: ", JSON.stringify(data), JSON.stringify(toJS(this.player1)))
         }
 
         if (Player.isPlayerTwo(player, this.player1)) {
           player.setPlayer(2)
           this.player2 = player
-          console.log("[Store#saveSession]...in `fetchData#fn` loading player 2: ", JSON.stringify(data), JSON.stringify(this.player2)) 
+          console.log("[Store#saveSession]...in `fetchData#fn` loading player 2: ", JSON.stringify(data), JSON.stringify(toJS(this.player2))) 
         }
       })
 

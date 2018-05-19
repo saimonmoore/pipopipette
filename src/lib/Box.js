@@ -100,11 +100,14 @@ class Box {
     const brbl = this.bottomRightBottomLeftEdge()
     const bltl = this.bottomLeftTopLeftEdge()
 
+    console.log(`[Box#findEdgeForLine]... line: ${line.id} edge: ${edge} ${tltr} ${trbr} ${brbl} ${bltl}`)
+
     if (edge === tltr) return "topLeftTopRight"
     if (edge === trbr) return "topRightBottomRight"
     if (edge === brbl) return "bottomRightBottomLeft"
     if (edge === bltl) return "bottomLeftTopLeft"
 
+    console.log(`[Box#findEdgeForLine]... did not find edge for line: ${line.id} edge: ${edge}`)
     return null
   }
 
@@ -120,20 +123,27 @@ class Box {
   }
 
   addLine(line) {
+    console.log(`[Box#addLine]...line: ${line.id}`)
     const edge = this.findEdgeForLine(line)
+    console.log(`[Box#addLine]...edge: ${edge}`)
 
     if (!edge) return null
     if (!!this.edges[edge]) return null
+    console.log(`[Box#addLine]...edge: ${edge} does not already exist`)
 
     this.edges[edge] = line.connection
+    console.log(`[Box#addLine]...adding edge: ${edge} to edges: ${JSON.stringify(this.edges)}`)
 
+    console.log(`[Box#addLine]...checking if closed... this.closed: ${this.closed.get()} isClosed(): ${this.isClosed()}`)
     if (!this.closed.get() && this.isClosed()) {
+      console.log(`[Box#addLine]...should be closed but not marked as such! Closing!`)
       this.closed.set(true)
       this.setPlayer(line.player)
 
       return true
     }
 
+    console.log(`[Box#addLine]... either already closed or not closed...`)
     return null
   }
 
@@ -145,11 +155,13 @@ class Box {
     const closed = toJS(this.closed)
     const colour = toJS(this.colour)
 
+    console.log(`[Box#serialize]... coords: ${JSON.stringify(coords)} edges: ${JSON.stringify(edges)} closed: ${closed} colour: ${colour}`)
     return { coords, edges, player, closed, colour }
   }
 
   static unserialize(data, player1, player2) {
     const { coords, edges, closed, colour } = data
+    console.log(`[Box#unserialize]... got coords: ${JSON.stringify(coords)} edges: ${JSON.stringify(edges)} closed: ${closed} colour: ${colour}`)
     let player;
 
     if (data.player && (data.player.user_id === player1.id)) player = player1
@@ -157,7 +169,9 @@ class Box {
 
     const box = new Box(Object.assign({player, colour}, coords))
     Object.assign(box.edges, edges)
+    console.log(`[Box#unserialize]... assigned edges: ${JSON.stringify(edges)} to box: ${JSON.stringify(box)}`)
     box.closed.set(closed)
+    console.log(`[Box#unserialize]... setting box closed to: ${closed}`)
 
     return box
   }
