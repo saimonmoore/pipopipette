@@ -1,6 +1,7 @@
 export default {
-  minimumGridSize: 2,
-  defaultGridSize: 2,
+  minimumGridSize: 4,
+  maxGridSize: 9,
+  defaultGridSize: 4,
   dotRadius: 20,
   dotSpacing: 150,
   dotStroke: "#61d609",

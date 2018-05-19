@@ -4,12 +4,11 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
 import { range } from '../utils.js'
+import Constants from "../constants.js"
 
 import "./Form.css"
 
 class Form extends Component {
-  MAX_GRID_SIZE = 20
-
   constructor(props) {
     super(props)
 
@@ -28,7 +27,9 @@ class Form extends Component {
   }
 
   gridSizeOptions() {
-    return range(this.MAX_GRID_SIZE).map((size) => (
+    return range(Constants.maxGridSize).filter((size) => (
+      size >= Constants.minimumGridSize
+    )).map((size) => (
       { label: `${size} x ${size}`, name: size, value: size }
     ))
   }

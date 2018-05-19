@@ -86,12 +86,10 @@ class Store {
     const player = new Player(data)
     if (Player.isPlayerTwo(player, this.player1)) {
       player.setPlayer(2)
-
-      if (this.player.colour.get() !== player.colour) {
-        this.setColour(player, player.colour)
-      }
-
       this.player2 = player
+
+      this.setColour(this.player2, player.colour)
+
       console.log("[Store#handlePlayerChanged]...was player 2: ", JSON.stringify(toJS(this.player2)))
     }
   }
