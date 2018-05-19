@@ -59,7 +59,7 @@ class Store {
     console.log("[Store#handleGridSizeChanged]...grid_size: ", grid_size)
     if (this.grid_size.get() !== grid_size) {
       console.log("[Store#handleGridSizeChanged]...changing grid_size: ", this.grid_size.get(), grid_size)
-      this.changeGridSize(grid_size)
+      this.changeGridSize(grid_size, false)
       console.log("[Store#handleGridSizeChanged]...changed grid_size...now fetching data...")
 
       this.fetchData().then((data) => {
@@ -184,6 +184,8 @@ class Store {
     Object.assign(this.user, session.user)
     this.player1 = new Player(this.user)
     this.session.turn = this.player1.id
+    const currentGridSize = this.grid_size.get();
+    console.log("[Store#saveSession]...current grid size: ", currentGridSize); 
 
     console.log("[Store#saveSession]...about to call `fetchData` session: ", JSON.stringify(session)) 
     // TODO: Enable loading indicator
@@ -197,7 +199,7 @@ class Store {
         Object.assign(this.session, session)
         console.log("[Store#saveSession]...in `fetchData#fn` got session: ", JSON.stringify(session)) 
 
-        if ((this.grid_size.get() !== session.grid_size) && (session.grid_size > Constants.minimumGridSize)) {
+        if ((currentGridSize !== session.grid_size) && (session.grid_size > Constants.minimumGridSize)) {
           console.log("[Store#saveSession]...in `fetchData#fn` changing grid_size to: ", session.grid_size) 
           this.changeGridSize(session.grid_size)
         }
@@ -319,13 +321,13 @@ class Store {
     console.log("[Store#setDefaultGridSize]...done") 
   }
 
-  changeGridSize(newSize) {
+  changeGridSize(newSize, persist) {
     console.log("[Store#changeGridSize]...") 
     this.clear()
     this.setGridSize(newSize)
     this.setup()
     console.log("[Store#changeGridSize]...done setup") 
-    this.persistSession()
+    if (persist) this.persistSession()
     console.log("[Store#changeGridSize]...done") 
   }
 
@@ -429,20 +431,21 @@ class Store {
   }
 
   addLine(line, player) {
-    console.log("[Store#addLine]...line: ", JSON.stringify(line), player && JSON.stringify(player)) 
+    console.log("[Store#addLine]...line: ", line, player) 
     let boxClosed;
     line.setPlayer(player || this.player1)
     this.lines.push(line)
     const boxes = Box.findBoxes(line, this.boxes)
     boxes.forEach((box) => {
       boxClosed = box.addLine(line)
+      console.log("[Store#addLine]...boxClosed: ", boxClosed) 
     })
 
+    console.log("[Store#addLine]...setting turn: ", player || this.player1,  boxClosed) 
     this.setTurn(player || this.player1, boxClosed)
 
     if (this.hasWon()) {
       this.setStatus("game_over")
-      this.persistSession()
     }
 
     console.log("[Store#addLine]...done...persisting session") 
