@@ -41,6 +41,32 @@ class GameOver extends Component  {
     if (this.winningPlayer === 2) return this.scorePlayer1
   }
 
+  get currentPlayerWon() {
+    const { player1, player2 } = this.props.store
+
+    return (this.winningPlayer === 1)
+  }
+
+  renderCongrats() {
+    if (!this.currentPlayerWon) return
+
+    return (
+      <p>
+        Congratulations! You win! ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+      </p>
+    )
+  }
+
+  renderSorry() {
+    if (this.currentPlayerWon) return
+
+    return (
+      <p>
+        You lost!!! The other player won! ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+      </p>
+    )
+  }
+
   onClose() {
   }
 
@@ -55,9 +81,8 @@ class GameOver extends Component  {
             Game over
           </h2>
 
-          <p>
-            Congratulations player {this.winningPlayer}! You win! ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
-          </p>
+          { this.renderCongrats() }
+          { this.renderSorry() }
 
           <p>
             Play again? Click this <a href={window.location.href.split('#')[0]}>link</a>.
