@@ -108,8 +108,9 @@ class Store {
       this.player2 = player
 
       this.setColour(this.player2, player.colour)
+      if (!this.turn.get()) this.turn.set(this.player1.id)
       this.setStatus("running")
-      console.log("[Store#handlePlayerAdded]...was player 2...game now running...")
+      console.log(`[Store#handlePlayerAdded]...was player 2...game now running...turn: ${this.turn.get()}`)
     }
   }
 
@@ -413,6 +414,7 @@ class Store {
     if (boxClosed) return
 
     const nextTurn = player.id === this.player1.id ? this.player2.id : this.player1.id
+    console.log("[Store#setTurn]...setting turn: ", nextTurn, this.player1.id, this.player2.id)
     this.turn.set(nextTurn)
     this.session.turn = this.turn.get()
   }
