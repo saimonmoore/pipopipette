@@ -441,11 +441,10 @@ class Store {
     this.lines.push(line)
     const boxes = Box.findBoxes(line, this.boxes)
     boxes.forEach((box) => {
-      boxClosed = box.addLine(line)
-      console.log("[Store#addLine]...boxClosed: ", boxClosed) 
+      if (box.addLine(line)) boxClosed = true
     })
 
-    console.log("[Store#addLine]...setting turn: ", player || this.player1,  boxClosed) 
+    console.log(`[Store#addLine]...setting turn: ${(player || this.player1).id} boxClosed: ${boxClosed}`) 
     this.setTurn(player || this.player1, boxClosed)
 
     if (this.hasWon()) {
