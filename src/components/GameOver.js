@@ -42,8 +42,6 @@ class GameOver extends Component  {
   }
 
   get currentPlayerWon() {
-    const { player1, player2 } = this.props.store
-
     return (this.winningPlayer === 1)
   }
 
