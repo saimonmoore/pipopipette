@@ -12,15 +12,18 @@ class Dot extends Component {
     const { dot, onDotClick } = this.props
     const column = dot.column
     const row = dot.row
+    const selected = false
 
     this.onDotClick = onDotClick
-    this.state = { column, row, dot }
+    this.state = { column, row, dot, selected }
 
     this.onClick = this.onClick.bind(this)
   }
 
   onClick(event) {
     this.onDotClick(this.props.dot)
+    const { selected } = this.state
+    this.setState({ selected: !selected })
   }
 
   get x() {
@@ -34,18 +37,24 @@ class Dot extends Component {
   }
 
   render() {
+    const { selected } = this.state
     const { flashing } = this.state.dot
+    const { ourTurn } = this.props
 
-    const classNames = flashing ? "Dot flash" : "Dot"
+    const classNames = ["Dot"]
+    if (ourTurn) classNames.push("OurTurn")
+    if (!ourTurn) classNames.push("TheirTurn")
+    if (selected) classNames.push("Selected")
+    if (flashing) classNames.push("Flash")
 
     return (<circle
                cx={this.x}
                cy={this.y}
                r={Constants.dotRadius}
                stroke={Constants.dotStroke}
-               strokeWidth="4"
+               strokeWidth="2"
                fill={Constants.dotFill}
-               className={classNames}
+               className={classNames.join(" ")}
                onClick={this.onClick}/>);
   }
 }

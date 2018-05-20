@@ -45,22 +45,38 @@ class GameOver extends Component  {
     return (this.winningPlayer === 1)
   }
 
+  get draw() {
+    return (!this.winningPlayer)
+  }
+
   renderCongrats() {
+    if (this.draw) return
     if (!this.currentPlayerWon) return
 
     return (
       <p>
-        Congratulations! You win! ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+        Congratulations! You win! 😀 ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
       </p>
     )
   }
 
   renderSorry() {
+    if (this.draw) return
     if (this.currentPlayerWon) return
 
     return (
       <p>
-        You lost!!! The other player won! ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+        You lost!!! 😞 ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+      </p>
+    )
+  }
+
+  renderDraw() {
+    if (!this.draw) return
+
+    return (
+      <p>
+        Draw!!! You both won 😉 ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
       </p>
     )
   }
@@ -81,6 +97,7 @@ class GameOver extends Component  {
 
           { this.renderCongrats() }
           { this.renderSorry() }
+          { this.renderDraw() }
 
           <p>
             Play again? Click this <a href={window.location.href.split('#')[0]}>link</a>.

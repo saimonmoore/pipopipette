@@ -122,11 +122,21 @@ class Grid extends Component {
     }
   }
 
+  get isOurTurn() {
+    const { turn, player1, player2 } = this.props.store
+    
+    const ourTurn = (turn.get() === player1.id)
+    console.log(`[Grid#isOurTurn] ourTurn: ${ourTurn}`)
+    return ourTurn
+  }
+
   renderDot(dot) {
     const { active } = this.state;
+
     return <DotView
       key={dot.id}
       dot={dot}
+      ourTurn={this.isOurTurn}
       point={this.pt}
       active={active.includes(dot)}
       onClick={this.onClickObject}
@@ -169,9 +179,9 @@ class Grid extends Component {
           onMouseDown={this.handleMouseDown.bind(this)}
           onMouseUp={this.handleMouseUp.bind(this)}
         >
-          {dot_views}
           {line_views}
           {box_views}
+          {dot_views}
         </svg>
       </div>
     );
