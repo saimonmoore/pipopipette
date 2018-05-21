@@ -5,7 +5,7 @@ import uniqid from 'uniqid';
 import Store from './stores/Store.js';
 import WaitingForPlayer from './components/WaitingForPlayer.js';
 import GameOver from './components/GameOver.js';
-import Form from './components/Form.js';
+import Form from './components/Form';
 import Player from './components/Player.js';
 import Grid from './components/Grid.js';
 import Auth from './lib/Auth.js';

@@ -3,10 +3,10 @@ import { inject, observer } from 'mobx-react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
-import { range } from '../utils.js';
-import Constants from '../constants.js';
+import { range } from '../../utils.js';
+import Constants from '../../constants.js';
 
-import './Form.css';
+import './styles/index.css';
 
 class Form extends Component {
   constructor(props) {
