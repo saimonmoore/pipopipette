@@ -35,7 +35,11 @@
 
   background-size: 50px 50px;
   /* background-image: linear-gradient(to right, cyan 2px, transparent 1px), linear-gradient(to bottom, cyan 1px, transparent 1px); */
-  background-image: radial-gradient(circle, #61d60914 2px, rgba(0, 0, 0, 0) 55px);
+  background-image: radial-gradient(
+    circle,
+    #61d60914 2px,
+    rgba(0, 0, 0, 0) 55px
+  );
 }
 
 .LeftPanel {
@@ -59,8 +63,12 @@
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .Recognition {

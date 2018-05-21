@@ -4,6 +4,6 @@ export default {
   defaultGridSize: 3,
   dotRadius: 5,
   dotSpacing: 150,
-  dotStroke: "#61d609",
-  dotFill: "lightgray",
-}
+  dotStroke: '#61d609',
+  dotFill: 'lightgray'
+};

@@ -2,19 +2,19 @@
 }
 
 .WaitingForPlayer a {
-  cursor: pointer
+  cursor: pointer;
 }
 
 .WaitingForPlayer button {
-  border: "0px";
-  font-size: "20px";
-  margin-top: "100px";
-  background-color: "#e6e378";
+  border: '0px';
+  font-size: '20px';
+  margin-top: '100px';
+  background-color: '#e6e378';
 }
 
 .WaitingForPlayer button.hover {
-  border: "0px";
-  font-size: "20px";
-  margin-top: "100px";
-  background-color: "#ccc96a";
+  border: '0px';
+  font-size: '20px';
+  margin-top: '100px';
+  background-color: '#ccc96a';
 }

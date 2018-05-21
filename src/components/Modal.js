@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 class Modal extends React.Component {
   render() {
     // Render nothing if the "show" prop is false
-    if(!this.props.show) {
+    if (!this.props.show) {
       return null;
     }
 
@@ -17,7 +17,7 @@ class Modal extends React.Component {
       right: 0,
       backgroundColor: 'rgba(0,0,0,0.3)',
       padding: 50,
-      zIndex: 999,
+      zIndex: 999
     };
 
     // The modal "window"
@@ -28,11 +28,13 @@ class Modal extends React.Component {
       minHeight: 300,
       margin: '80px auto',
       padding: 30,
-      fontFamily: "fantasy",
-      fontSize: 20,
+      fontFamily: 'fantasy',
+      fontSize: 20
     };
 
-    const closable = this.props.hasOwnProperty('closable') ? this.props.closable : true
+    const closable = this.props.hasOwnProperty('closable')
+      ? this.props.closable
+      : true;
 
     return (
       <div className="backdrop" style={backdropStyle}>
@@ -40,12 +42,7 @@ class Modal extends React.Component {
           {this.props.children}
 
           <div className="footer">
-            {
-              closable &&
-              <button onClick={this.props.onClose}>
-                Close
-              </button>
-            }
+            {closable && <button onClick={this.props.onClose}>Close</button>}
           </div>
         </div>
       </div>
