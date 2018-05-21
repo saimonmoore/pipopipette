@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 
 import Constants from "../constants.js"
 
+import "../animate.css"
 import "./Dot.css"
 
 class Dot extends Component {

@@ -55,7 +55,7 @@ class GameOver extends Component  {
 
     return (
       <p>
-        Congratulations! You win! 😀 ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+        Congratulations! You win! <span role="img" aria-label="Happy">😀</span>({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
       </p>
     )
   }
@@ -66,7 +66,7 @@ class GameOver extends Component  {
 
     return (
       <p>
-        You lost!!! 😞 ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+        You lost!!! <span role="img" aria-label="Sad">😞</span>({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
       </p>
     )
   }
@@ -76,7 +76,7 @@ class GameOver extends Component  {
 
     return (
       <p>
-        Draw!!! You both won 😉 ({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
+        Draw!!! You both won <span role="img" aria-label="Wink">😉</span>({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer} boxes)
       </p>
     )
   }
