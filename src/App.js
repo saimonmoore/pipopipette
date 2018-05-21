@@ -20,155 +20,79 @@ class App extends Component {
     super(props);
 
     this.state = { session: {} };
-    console.log('[App#constructor] ===> beforeInitSession');
     this.initSession(session => {
-      console.log(
-        '[App#constructor] ===> in InitSession#fn...about to call `store.saveSession` with: ',
-        JSON.stringify(session)
-      );
       store.saveSession(session);
-      console.log(
-        '[App#constructor] ===> in InitSession#fn...called `store.saveSession`'
-      );
       this.state = { session };
     });
   }
 
   // Session without firebase authentication
   initSession(fn) {
-    console.log('[App#initSession] ===> ...looking for session');
     let session = this.session();
 
     if (!session) {
-      console.log(
-        '[App#initSession] ===> ...no session found....about to call #signup'
-      );
       session = this.createSession();
-      console.log(
-        '[App#initSession] ===> ...created session: ',
-        JSON.stringify(session)
-      );
       fn(session);
     } else {
-      console.log(
-        '[App#initSession] ===> ...found session:',
-        JSON.stringify(session)
-      );
       window.location.hash = session.session_id;
-      console.log(
-        '[App#initSession] ===> ...set location hash to:',
-        window.location.hash
-      );
       fn(session);
     }
   }
 
   // Session with firebase authentication
   // initSession(fn) {
-  //   console.log("[App#initSession] ===> ...looking for session")
   //   let session = this.session()
 
   //   if (!session) {
-  //     console.log("[App#initSession] ===> ...no session found....about to call #signup")
   //     this.signup((error) => {
-  //       console.log("[App#initSession] ===> ...in signup#fn ...")
   //       if (error) {
-  //         console.log("[App#initSession] ===> ...in signup#fn error! ", JSON.stringify(error))
   //         alert(`Failed to signup! (${JSON.stringify(error)})`)
   //       } else {
-  //         console.log("[App#initSession] ===> ...in signup#fn...creating session ")
   //         session = this.createSession()
-  //         console.log("[App#initSession] ===> ...in signup#fn...created session: ", JSON.stringify(session))
-  //         console.log("[App#initSession] ===> ...in signup#fn...about to login...")
   //         this.login(session)
-  //         console.log("[App#initSession] ===> ...in signup#fn...logged in...about to call outer fn with session")
   //         fn(session)
   //       }
   //     })
   //   } else {
-  //     console.log("[App#initSession] ===> ...found session:", JSON.stringify(session))
   //     window.location.hash = session.session_id
-  //     console.log("[App#initSession] ===> ...set location hash to:", window.location.hash)
-  //     console.log("[App#initSession] ===> ...about to login...")
   //     this.login(session)
-  //     console.log("[App#initSession] ===> ...logged in...about to call outer fn with session")
   //     fn(session)
   //   }
   // }
 
   login(session) {
-    console.log('[App#login] ===> ...with session:', JSON.stringify(session));
     auth.login(this.getUserId(), (error, auth_user) => {
-      console.log('[App#login] ===> in auth.login#fn');
       if (!error) {
-        console.log(
-          '[App#login] ===> in auth.login#fn no error auth_user: ',
-          JSON.stringify(auth_user)
-        );
         // TODO: What do we need the uid for?
         // Object.assign(session.user, { uid: auth_user.uid })
         // this.saveSession(session)
       } else {
-        console.log(
-          '[App#login] ===> in auth.login#fn error! ',
-          JSON.stringify(error)
-        );
         alert(`Failed to login! (${JSON.stringify(error)})`);
       }
     });
-    console.log('[App#login] ===> ...after auth.login');
   }
 
   signup(fn) {
-    console.log('[App#signup] ===> ...before #getUserId');
     this.getUserId((signup, user_id) => {
       if (signup) {
-        console.log(
-          '[App#signup] ===> ...in #getUserId#fn have to signup for user_id: ',
-          user_id
-        );
-        console.log(
-          '[App#signup] ===> ...in #getUserId#fn calling auth.signup for user_id: ',
-          user_id
-        );
         auth.signup(user_id, error => {
           if (error) {
-            console.log(
-              '[App#signup] ===> ...in auth.signup#fn user_id: ',
-              user_id,
-              ' error: ',
-              JSON.stringify(error)
-            );
             fn && fn(error, null);
           } else {
-            console.log(
-              '[App#signup] ===> ...in auth.signup#fn user_id: ',
-              user_id,
-              ' no error...calling outer fn'
-            );
             fn && fn(null, user_id);
           }
         });
       } else {
-        console.log(
-          "[App#signup] ===> ...in #getUserId#fn don't have to signup for user_id: ",
-          user_id
-        );
         fn && fn(null, user_id);
       }
     });
   }
 
   saveSession(session) {
-    console.log(
-      '[App#saveSession] saving session to sessionStorage: ',
-      JSON.stringify(session)
-    );
     sessionStorage.setItem('pipopipette_session', JSON.stringify(session));
   }
 
   createSession() {
-    console.log('[App#createSession] creating session... ');
     const session_id = this.session_id;
     const user_id = this.getUserId();
 
@@ -180,20 +104,13 @@ class App extends Component {
       user: { user_id }
     };
 
-    console.log(
-      '[App#createSession] created session: ',
-      JSON.stringify(session)
-    );
-    console.log('[App#createSession] now saving session to sessionStorage');
     this.saveSession(session);
-    console.log('[App#createSession] done saving session to sessionStorage');
     return session;
   }
 
   get session_id() {
     const hash = window.location.hash.substr(1);
     const session_id = (hash.length && hash) || uniqid();
-    console.log('[App#session_id] session_id: ', session_id);
     return session_id;
   }
 
@@ -201,7 +118,6 @@ class App extends Component {
     let session;
     try {
       session = JSON.parse(sessionStorage.getItem('pipopipette_session'));
-      console.log('[App#session] session: ', JSON.stringify(session));
       return session;
     } catch (err) {
       console.log('[App#session] err: ', JSON.stringify(err));
@@ -225,7 +141,6 @@ class App extends Component {
   }
 
   render() {
-    console.log('[App#render] starting...');
     const { session } = this.state;
     const { grid_size, boxes, lines, dots, player1, player2 } = store;
 

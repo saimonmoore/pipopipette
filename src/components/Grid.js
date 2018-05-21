@@ -130,7 +130,6 @@ class Grid extends Component {
     const { turn, player1 } = this.props.store;
 
     const ourTurn = turn.get() === player1.id;
-    console.log(`[Grid#isOurTurn] ourTurn: ${ourTurn}`);
     return ourTurn;
   }
 
