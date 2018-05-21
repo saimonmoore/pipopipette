@@ -15,6 +15,11 @@ import './App.css';
 const store = new Store();
 const auth = new Auth();
 
+if (window.Cypress) {
+  // only available during E2E tests
+  window.app = { store };
+}
+
 class App extends Component {
   constructor(props) {
     super(props);

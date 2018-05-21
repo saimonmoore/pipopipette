@@ -9,8 +9,6 @@ import Storage from '../lib/Storage.js';
 
 import Constants from '../constants.js';
 
-const storage = new Storage();
-
 class Store {
   grid_size = observable.box(Constants.defaultGridSize);
   turn = observable.box('');
@@ -24,6 +22,7 @@ class Store {
   session = {};
 
   constructor() {
+    this.storage = new Storage();
     this.handleLineAdded = this.handleLineAdded.bind(this);
     this.handleBoxChanged = this.handleBoxChanged.bind(this);
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this);
@@ -109,11 +108,11 @@ class Store {
     const session_id = this.session.session_id;
     const user_id = this.player1.id;
 
-    const fetchSession = storage.getSession(session_id);
-    const fetchLines = storage.getLines(session_id);
-    const fetchBoxes = storage.getBoxes(session_id);
-    const fetchUser = storage.getUser(session_id, user_id);
-    const fetchPlayers = storage.getPlayers(session_id);
+    const fetchSession = this.storage.getSession(session_id);
+    const fetchLines = this.storage.getLines(session_id);
+    const fetchBoxes = this.storage.getBoxes(session_id);
+    const fetchUser = this.storage.getUser(session_id, user_id);
+    const fetchPlayers = this.storage.getPlayers(session_id);
 
     const fetches = [
       fetchSession,
@@ -145,10 +144,10 @@ class Store {
 
   persistSession() {
     const session_id = this.session.session_id;
-    storage.setSession(session_id, toJS(this.session));
-    storage.setUser(session_id, this.player1.serialize());
-    storage.setLines(session_id, this.serialize(this.lines));
-    storage.setBoxes(session_id, this.serialize(this.boxes));
+    this.storage.setSession(session_id, toJS(this.session));
+    this.storage.setUser(session_id, this.player1.serialize());
+    this.storage.setLines(session_id, this.serialize(this.lines));
+    this.storage.setBoxes(session_id, this.serialize(this.boxes));
   }
 
   firstTimeActions() {
@@ -226,18 +225,18 @@ class Store {
 
   enableRealTimeListeners() {
     const session_id = this.session.session_id;
-    storage.onLineAdded(session_id, this.handleLineAdded);
-    storage.onBoxChanged(session_id, this.handleBoxChanged);
-    storage.onGridSizeChanged(session_id, this.handleGridSizeChanged);
-    storage.onPlayerAdded(session_id, this.handlePlayerAdded);
-    storage.onPlayerRemoved(session_id, this.handlePlayerRemoved);
-    storage.onPlayerChanged(session_id, this.handlePlayerChanged);
+    this.storage.onLineAdded(session_id, this.handleLineAdded);
+    this.storage.onBoxChanged(session_id, this.handleBoxChanged);
+    this.storage.onGridSizeChanged(session_id, this.handleGridSizeChanged);
+    this.storage.onPlayerAdded(session_id, this.handlePlayerAdded);
+    this.storage.onPlayerRemoved(session_id, this.handlePlayerRemoved);
+    this.storage.onPlayerChanged(session_id, this.handlePlayerChanged);
   }
 
   disableRealTimeListeners() {
     const session_id = this.session.session_id;
-    storage.offLineAdded(session_id);
-    storage.offBoxChanged(session_id);
+    this.storage.offLineAdded(session_id);
+    this.storage.offBoxChanged(session_id);
   }
 
   loadFromData(data) {
