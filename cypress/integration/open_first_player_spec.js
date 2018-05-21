@@ -23,6 +23,7 @@ describe('When player 1 first loads app', function() {
 
     it('shows Welcome dialogue', function() {
       cy.contains('This is Pipopipette.');
+      cy.contains('Share this');
     })
   });
 })
