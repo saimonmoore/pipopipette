@@ -29,8 +29,12 @@ describe('When player 1 first loads app', function() {
 
     context('when the other player joins', function() {
       before(function() {
+        // Wait for the app to load...
+        cy.get('#root > div > header > div.Status > span').invoke('text').should('eq', 'Waiting for other player')
+
         getStore().then(store => {
           store.handlePlayerAdded({ user_id: 1, colour: "green" })
+          cy.get('#root > div > header > div.Status > span').invoke('text').should('eq', 'Game started')
         })
       })
 
@@ -38,7 +42,11 @@ describe('When player 1 first loads app', function() {
         cy.get('.WaitingForPlayer').should('not.exist')
       })
 
-      it('shows correct turn', function() {
+      it('status shows game started', function() {
+        cy.get('#root > div > header > div.Status > span').invoke('text').should('eq', 'Game started')
+      })
+
+      it("shows player 1's turn", function() {
         cy.contains('Your turn')
       })
 
@@ -49,6 +57,17 @@ describe('When player 1 first loads app', function() {
       it('shows score zero for player 2', function() {
         cy.get('#root > div > header > div > div.RightPanel > div > div.RightPanel > div.Score > span').invoke('text').should('eq', 'Score: 0');
       })
+
+      context('when player 1 plays', function() {
+        before(function() {
+          cy.get('.Dot').first().click('left')
+          cy.get('.Dot').first().next().next().next().click('left')
+        });
+
+        it("shows player 2's turn", function() {
+          cy.contains('Their turn')
+        })
+      });
     });
   });
 })

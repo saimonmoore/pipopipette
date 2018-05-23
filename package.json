@@ -1,8 +1,8 @@
 {
-  "name": "pipopippete",
+  "name": "pipopipette",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://saimonmoore.github.io/pipopippete",
+  "homepage": "http://saimonmoore.github.io/pipopipette",
   "dependencies": {
     "firebase": "^4.13.1",
     "husky": "^0.14.3",

@@ -12,7 +12,7 @@ import Constants from '../constants.js';
 class Store {
   grid_size = observable.box(Constants.defaultGridSize);
   turn = observable.box('');
-  status = observable.box('waiting');
+  status = observable.box('loading');
   dots = [];
   lines = [];
   boxes = [];
@@ -151,13 +151,17 @@ class Store {
   }
 
   firstTimeActions() {
+    console.log(`[first time]=======> ${this.session.session_id}`);
     const colour = this.player1.colour;
+    console.log(`[first time]=======> player 1 colour: ${colour}`);
     if (!colour || !colour.length) {
+      console.log(`[first time]=======> setting random colour`);
       this.player1.setColour(this.assignRandomColour());
     }
 
     this.persistSession();
     this.enableRealTimeListeners();
+    this.status.set('waiting');
   }
 
   saveSession(session) {
@@ -193,7 +197,7 @@ class Store {
           if (session.status) {
             this.status.set(session.status);
           } else {
-            this.status.set('waiting');
+            this.status.set('loading');
           }
         }
 

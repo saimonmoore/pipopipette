@@ -15,7 +15,7 @@ import './App.css';
 const store = new Store();
 const auth = new Auth();
 
-if (window.Cypress) {
+if (window.Cypress || true) {
   // only available during E2E tests
   window.app = { store };
 }
@@ -145,6 +145,34 @@ class App extends Component {
     return user_id;
   }
 
+  renderStatusLabel() {
+    const { status } = store;
+    if (status.get() === 'loading')
+      return (
+        <div className="Status">
+          <span>Loading...</span>
+        </div>
+      );
+    if (status.get() === 'waiting')
+      return (
+        <div className="Status">
+          <span>Waiting for other player</span>
+        </div>
+      );
+    if (status.get() === 'running')
+      return (
+        <div className="Status">
+          <span>Game started</span>
+        </div>
+      );
+    if (status.get() === 'game_over')
+      return (
+        <div className="Status">
+          <span>Game over</span>
+        </div>
+      );
+  }
+
   render() {
     const { session } = this.state;
     const { grid_size, boxes, lines, dots, player1, player2 } = store;
@@ -155,6 +183,7 @@ class App extends Component {
           <WaitingForPlayer />
           <GameOver />
           <header className="Header">
+            {this.renderStatusLabel()}
             <div className="Header-wrapper">
               <div className="LeftPanel">
                 <Player player={player1} session={session} />
@@ -179,8 +208,8 @@ class App extends Component {
             </div>
             <div className="RightPanel" />
           </div>
-          <div class="Recognition">
-            <div class="Author">
+          <div className="Recognition">
+            <div className="Author">
               Made by{' '}
               <a
                 href="https://github.com/saimonmoore/pipopipette"
@@ -189,7 +218,7 @@ class App extends Component {
                 Dr Moore
               </a>
             </div>
-            <div class="Borrowings">
+            <div className="Borrowings">
               Icons made by{' '}
               <a href="http://www.freepik.com" title="Freepik">
                 Freepik
