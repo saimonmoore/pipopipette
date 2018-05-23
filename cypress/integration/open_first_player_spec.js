@@ -78,6 +78,18 @@ describe('When player 1 first loads app', function() {
         it("shows player 2's turn", function() {
           cy.contains('Their turn')
         })
+
+        it("shows forbidden cursor", function() {
+          cy.get(".Dot").should(($dots) => {
+            $dots.each((i, $dot) => ( expect($dot).to.have.class("TheirTurn") ))
+          })
+        })
+
+        it("shows 1 line", function() {
+          cy.get(".Line").should(($lines) => {
+            expect($lines).to.have.length(1)
+          })
+        })
       });
     });
   });
