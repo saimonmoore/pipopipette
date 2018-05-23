@@ -4,6 +4,7 @@ import { decorate, computed } from 'mobx';
 
 import Player from './Player.js';
 import Modal from './Modal.js';
+import Storage from '../lib/Storage.js';
 
 import './GameOver.css';
 
@@ -11,6 +12,7 @@ class GameOver extends Component {
   constructor(props) {
     super(props);
 
+    this.storage = new Storage();
     this.onClose = this.onClose.bind(this);
   }
 
@@ -95,6 +97,15 @@ class GameOver extends Component {
 
   onClose() {}
 
+  handleNewGame() {
+    const { session } = this.props.store;
+    this.storage.clearSession(session.session_id);
+    window.location.href = window.location.href.replace(
+      window.location.hash,
+      ''
+    );
+  }
+
   render() {
     const { status } = this.props.store;
     const show = status.get() === 'game_over';
@@ -110,7 +121,7 @@ class GameOver extends Component {
 
           <p>
             Play again? Click this{' '}
-            <a href={window.location.href.split('#')[0]}>link</a>.
+            <span onClick={this.handleNewGame}> here </span>
           </p>
         </div>
       </Modal>

@@ -42,6 +42,13 @@ class Storage {
     });
   }
 
+  clearSession(currentSession, fn) {
+    const ref = this.storage().ref(`${APP}/sessions`);
+    const updates = {};
+    updates[currentSession] = null;
+    ref.update(updates, fn);
+  }
+
   // e.g. grid_size
   setSession(session_name, session) {
     if (window.test_env) session = { ...session, ...{ testing: true } };
