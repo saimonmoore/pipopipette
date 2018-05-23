@@ -1,8 +1,20 @@
 describe('When player 1 first loads app', function() {
+  const getStore = () => cy.window().its('app.store')
+  const getStorage = () => cy.window().its('app.storage')
+
   before(function() {
     cy.visit('/');
     cy.hash({ timeout: 2000 }).then((hash) => {
       Cypress.env("session_hash", hash)
+
+      // Clear out existing testing sessions
+      getStorage().then((storage) => {
+        const currentSession = hash.slice(1)
+        console.log("clearing out old sessions except: ", currentSession)
+        storage.clearTestingSessions(currentSession, () => {
+          console.log("Old sessions deleted")
+        })
+      })
     })
   })
 
@@ -16,7 +28,6 @@ describe('When player 1 first loads app', function() {
   })
 
   context('when visiting page with session', function() {
-    const getStore = () => cy.window().its('app.store')
 
     before(function() {
       const session_hash = Cypress.env("session_hash")

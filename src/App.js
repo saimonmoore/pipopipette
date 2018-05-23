@@ -3,6 +3,7 @@ import { Provider, observer } from 'mobx-react';
 import uniqid from 'uniqid';
 
 import Store from './stores/Store.js';
+import Storage from './lib/Storage.js';
 import WaitingForPlayer from './components/WaitingForPlayer.js';
 import GameOver from './components/GameOver.js';
 import Form from './components/Form';
@@ -14,10 +15,12 @@ import './App.css';
 
 const store = new Store();
 const auth = new Auth();
+const storage = new Storage();
 
-if (window.Cypress || true) {
+if (window.Cypress) {
   // only available during E2E tests
-  window.app = { store };
+  window.app = { store, storage };
+  window.test_env = true;
 }
 
 class App extends Component {

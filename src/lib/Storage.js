@@ -28,29 +28,45 @@ class Storage {
     return firebase.database();
   }
 
+  clearTestingSessions(currentSession, fn) {
+    const testingSessions = {};
+    const ref = this.storage().ref(`${APP}/sessions`);
+    ref.once('value', function(snapshot) {
+      snapshot.forEach(function(child) {
+        const data = child.val();
+        const isTesting = data.session.testing;
+        if (isTesting && !currentSession)
+          testingSessions[data.session.session_id] = null;
+      });
+      ref.update(testingSessions, fn);
+    });
+  }
+
   // e.g. grid_size
   setSession(session_name, session) {
+    if (window.test_env) session = { ...session, ...{ testing: true } };
+
     this.storage()
-      .ref(`${APP}/${session_name}/session`)
+      .ref(`${APP}/sessions/${session_name}/session`)
       .set(session);
   }
 
   // e.g. colour
   setUser(session_name, user) {
     this.storage()
-      .ref(`${APP}/${session_name}/users/user_${user.user_id}`)
+      .ref(`${APP}/sessions/${session_name}/users/user_${user.user_id}`)
       .set(user);
   }
 
   setLines(session_name, lines) {
     this.storage()
-      .ref(`${APP}/${session_name}/lines`)
+      .ref(`${APP}/sessions/${session_name}/lines`)
       .set(lines);
   }
 
   setBoxes(session_name, boxes) {
     this.storage()
-      .ref(`${APP}/${session_name}/boxes`)
+      .ref(`${APP}/sessions/${session_name}/boxes`)
       .set(boxes);
   }
 
@@ -63,50 +79,54 @@ class Storage {
   }
 
   async getObject(session_name, object) {
-    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    const ref = this.storage().ref(
+      `/${APP}/sessions/${session_name}/${object}`
+    );
     return await ref.once('value');
   }
 
   async getSession(session_name) {
-    const ref = this.storage().ref(`${APP}/${session_name}/session`);
+    const ref = this.storage().ref(`${APP}/sessions/${session_name}/session`);
     return await ref.once('value');
   }
 
   async getUser(session_name, user_id) {
     const ref = this.storage().ref(
-      `${APP}/${session_name}/users/user_${user_id}`
+      `${APP}/sessions/${session_name}/users/user_${user_id}`
     );
     return await ref.once('value');
   }
 
   async getPlayers(session_name) {
-    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    const ref = this.storage().ref(`${APP}/sessions/${session_name}/users`);
     return await ref.once('value');
   }
 
   onGridSizeChanged(session_name, fn) {
-    const ref = this.storage().ref(`${APP}/${session_name}/session/grid_size`);
+    const ref = this.storage().ref(
+      `${APP}/sessions/${session_name}/session/grid_size`
+    );
     ref.on('value', snapshot => {
       fn(snapshot.val());
     });
   }
 
   onPlayerAdded(session_name, fn) {
-    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    const ref = this.storage().ref(`${APP}/sessions/${session_name}/users`);
     ref.on('child_added', snapshot => {
       fn(snapshot.val());
     });
   }
 
   onPlayerRemoved(session_name, fn) {
-    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    const ref = this.storage().ref(`${APP}/sessions/${session_name}/users`);
     ref.on('child_removed', snapshot => {
       fn(snapshot.val());
     });
   }
 
   onPlayerChanged(session_name, fn) {
-    const ref = this.storage().ref(`${APP}/${session_name}/users`);
+    const ref = this.storage().ref(`${APP}/sessions/${session_name}/users`);
     ref.on('child_changed', snapshot => {
       fn(snapshot.val());
     });
@@ -129,26 +149,34 @@ class Storage {
   }
 
   onObjectAdded(session_name, object, fn) {
-    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    const ref = this.storage().ref(
+      `/${APP}/sessions/${session_name}/${object}`
+    );
     ref.on('child_added', snapshot => {
       fn(snapshot.val());
     });
   }
 
   onObjectChanged(session_name, object, fn) {
-    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    const ref = this.storage().ref(
+      `/${APP}/sessions/${session_name}/${object}`
+    );
     ref.on('child_changed', snapshot => {
       fn(snapshot.val());
     });
   }
 
   offObjectAdded(session_name, object) {
-    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    const ref = this.storage().ref(
+      `/${APP}/sessions/${session_name}/${object}`
+    );
     ref.off('child_added');
   }
 
   offObjectChanged(session_name, object) {
-    const ref = this.storage().ref(`/${APP}/${session_name}/${object}`);
+    const ref = this.storage().ref(
+      `/${APP}/sessions/${session_name}/${object}`
+    );
     ref.off('child_changed');
   }
 }
