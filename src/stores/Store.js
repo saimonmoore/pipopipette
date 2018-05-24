@@ -21,9 +21,10 @@ class Store {
   user = {};
   session = {};
 
-  constructor() {
+  constructor(options) {
+    options = options || {};
     this.storage = new Storage();
-    this.storage.clearOldEndedSessions();
+    if (!options.testing_env) this.storage.clearOldEndedSessions();
     this.handleLineAdded = this.handleLineAdded.bind(this);
     this.handleBoxChanged = this.handleBoxChanged.bind(this);
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this);

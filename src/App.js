@@ -13,7 +13,10 @@ import Auth from './lib/Auth.js';
 
 import './App.css';
 
-const store = new Store();
+const storeOpts = {};
+
+if (window.Cypress) storeOpts['testing_env'] = true;
+const store = new Store(storeOpts);
 const auth = new Auth();
 const storage = new Storage();
 
