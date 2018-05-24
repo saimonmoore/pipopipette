@@ -23,6 +23,7 @@ class Store {
 
   constructor() {
     this.storage = new Storage();
+    this.storage.clearOldEndedSessions();
     this.handleLineAdded = this.handleLineAdded.bind(this);
     this.handleBoxChanged = this.handleBoxChanged.bind(this);
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this);
@@ -143,7 +144,14 @@ class Store {
   }
 
   persistSession() {
-    const session_id = this.session.session_id;
+    const { session_id, timestamp } = this.session;
+
+    if (!timestamp) {
+      const now = new Date().getTime();
+      console.log('[Warning] no timestamp found! Setting to: ', now);
+      this.session['timestamp'] = now;
+    }
+
     this.storage.setSession(session_id, toJS(this.session));
     this.storage.setUser(session_id, this.player1.serialize());
     this.storage.setLines(session_id, this.serialize(this.lines));
@@ -267,6 +275,8 @@ class Store {
 
   destroySession() {
     sessionStorage.removeItem('pipopipette_session');
+    const currentSession = this.session.session_id;
+    this.storage.clearSession(currentSession);
   }
 
   assignRandomColour() {
@@ -414,9 +424,10 @@ class Store {
 
     if (this.hasWon()) {
       this.setStatus('game_over');
+      this.destroySession();
+    } else {
+      this.persistSession();
     }
-
-    this.persistSession();
   }
 
   removeLine(line) {

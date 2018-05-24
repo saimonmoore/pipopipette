@@ -28,6 +28,21 @@ class Storage {
     return firebase.database();
   }
 
+  clearOldEndedSessions() {
+    const ref = this.storage().ref(`${APP}/sessions`);
+    const now = Date.now();
+    const cutoff = now - 7 * 24 * 60 * 60 * 1000; // 7 days ago
+    const old = ref.orderByChild('session/timestamp').endAt(cutoff);
+    old.on('child_added', function(snapshot) {
+      console.log(
+        `Removing old session... ${snapshot.ref.key} ${JSON.stringify(
+          snapshot.val().session.timestamp
+        )}`
+      );
+      snapshot.ref.remove();
+    });
+  }
+
   clearTestingSessions(currentSession, fn) {
     const testingSessions = {};
     const ref = this.storage().ref(`${APP}/sessions`);
