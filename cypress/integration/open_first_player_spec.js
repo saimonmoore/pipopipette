@@ -1,3 +1,4 @@
+// TODO: Fix grid size to 3 x 3
 describe('When player 1 first loads app', function() {
   const getStore = () => cy.window().its('app.store')
   const getStorage = () => cy.window().its('app.storage')
