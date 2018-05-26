@@ -8,9 +8,12 @@ class Box extends Component {
     const hiddenStyles = { display: 'none' };
     const visibleStyles = { display: 'block' };
     const styles = hide ? hiddenStyles : visibleStyles;
+    const hiddenClasses = 'Box';
+    const visibleClasses = 'Box Closed';
+    const classes = hide ? hiddenClasses : visibleClasses;
 
     return (
-      <g stroke="red" strokeWidth="5" style={styles}>
+      <g stroke="red" strokeWidth="5" className={classes} style={styles}>
         <polygon points={box.coordinates} fill={colour} />
       </g>
     );
