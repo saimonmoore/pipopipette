@@ -1,3 +1,7 @@
 {
-  "baseUrl": "http://localhost:3002"
+  "baseUrl": "http://localhost:3002",
+  "env": {
+    "player2_colour": "green",
+    "player2_id": 1
+  }
 }
