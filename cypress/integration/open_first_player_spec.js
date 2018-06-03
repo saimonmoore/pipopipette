@@ -167,6 +167,47 @@ describe('When player 1 first loads app', function() {
             .should('eq', 'Score: 0');
         });
       });
+
+      context('when player 2 closes a box', function() {
+        before(function() {
+          cy.addsLine(7, 6);
+          cy.otherAddsLine([2, 0], [1, 0]);
+        });
+
+        it("shows player 2's turn", function() {
+          cy.contains('Their turn');
+        });
+
+        it('shows 2 boxes closed', function() {
+          cy.get('.Box.Closed').should($boxes => {
+            expect($boxes).to.have.length(2);
+          });
+        });
+
+        it('shows score 1 for player 1', function() {
+          cy
+            .get(
+              '#root > div > header > div > div.LeftPanel > div > div.RightPanel > div.Score > span',
+            )
+            .invoke('text')
+            .should('eq', 'Score: 1');
+        });
+
+        it('shows score 1 for player 2', function() {
+          cy
+            .get(
+              '#root > div > header > div > div.RightPanel > div > div.RightPanel > div.Score > span',
+            )
+            .invoke('text')
+            .should('eq', 'Score: 1');
+        });
+
+        it('shows forbidden cursor', function() {
+          cy.get('.Dot').should($dots => {
+            $dots.each((i, $dot) => expect($dot).to.have.class('TheirTurn'));
+          });
+        });
+      });
     });
   });
 });
