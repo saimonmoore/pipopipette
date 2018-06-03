@@ -65,7 +65,6 @@ class GameOver extends Component {
       </p>
     );
   }
-
   renderSorry() {
     if (this.draw) return;
     if (this.currentPlayerWon) return;
@@ -80,23 +79,18 @@ class GameOver extends Component {
       </p>
     );
   }
-
   renderDraw() {
     if (!this.draw) return;
-
     return (
       <p>
         Draw!!! You both won{' '}
         <span role="img" aria-label="Wink">
           😉
-        </span>({this.scoreWinningPlayer} boxes vs {this.scoreLosingPlayer}{' '}
-        boxes)
+        </span>({this.scorePlayer1} boxes vs {this.scorePlayer2} boxes)
       </p>
     );
   }
-
   onClose() {}
-
   handleNewGame() {
     const { session } = this.props.store;
     this.storage.clearSession(session.session_id);
@@ -105,15 +99,13 @@ class GameOver extends Component {
       ''
     );
   }
-
   render() {
     const { status } = this.props.store;
     const show = status.get() === 'game_over';
-
     return (
       <Modal show={show} onClose={this.onClose} closable={false}>
         <div className="GameOver">
-          <h2>Game over</h2>
+          <h2>Game Over</h2>
 
           {this.renderCongrats()}
           {this.renderSorry()}
@@ -128,7 +120,6 @@ class GameOver extends Component {
     );
   }
 }
-
 decorate(GameOver, {
   winningPlayer: computed,
   scoreWinningPlayer: computed,
@@ -136,5 +127,4 @@ decorate(GameOver, {
   scorePlayer1: computed,
   scorePlayer2: computed
 });
-
 export default inject('store')(observer(GameOver));
