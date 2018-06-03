@@ -7,15 +7,6 @@ describe('When player 1 first loads app', function() {
     cy.visit('/');
     cy.hash({timeout: 2000}).then(hash => {
       Cypress.env('session_hash', hash);
-
-      // Clear out existing testing sessions
-      getStorage().then(storage => {
-        const currentSession = hash.slice(1);
-        console.log('clearing out old sessions except: ', currentSession);
-        storage.clearTestingSessions(currentSession, () => {
-          console.log('Old sessions deleted');
-        });
-      });
     });
   });
 

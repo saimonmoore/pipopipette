@@ -10,6 +10,11 @@ class Storage {
   initRemoteStorage() {
     if (!firebase.apps.length) {
       firebase.initializeApp(this.config());
+
+      // firebase.database.enableLogging(function(logMessage) {
+      //   // Add a timestamp to the messages.
+      //   console.log(new Date().toISOString() + ': ' + logMessage);
+      // });
     }
   }
 
@@ -45,17 +50,45 @@ class Storage {
     });
   }
 
+  clearOldTestingSessions(currentSession) {
+    const ref = this.storage().ref(`/${APP}/sessions`);
+    const now = Date.now();
+    const cutoff = now - 2 * 60 * 1000; // 1 minute ago
+    const old = ref.orderByChild('session/timestamp').endAt(cutoff);
+    old.on('child_added', function(snapshot) {
+      const data = snapshot.val();
+      const { session } = data;
+      const isTesting = session && session.testing;
+      if (
+        session &&
+        session.timestamp &&
+        isTesting &&
+        (!currentSession || session.session_id !== currentSession)
+      ) {
+        console.log(
+          `Removing old testing session... ${snapshot.ref.key} ${JSON.stringify(
+            data
+          )}`
+        );
+        snapshot.ref.remove();
+      }
+    });
+  }
+
   clearTestingSessions(currentSession, fn) {
     const testingSessions = {};
-    const ref = this.storage().ref(`${APP}/sessions`);
+    const ref = this.storage().ref(`/${APP}/sessions/`);
     ref.once('value', function(snapshot) {
       snapshot.forEach(function(child) {
         const data = child.val();
         const isTesting = data.session.testing;
-        debugger;
         if (isTesting && !currentSession)
           testingSessions[data.session.session_id] = null;
       });
+      console.log(
+        '[clearTestingSessions] =======> updating testingSessions: ',
+        testingSessions
+      );
       ref.update(testingSessions, fn);
     });
   }

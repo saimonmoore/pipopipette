@@ -25,6 +25,7 @@ class Store {
     options = options || {};
     this.storage = new Storage();
     if (!options.testing_env) this.storage.clearOldEndedSessions();
+    if (options.testing_env) this.storage.clearOldTestingSessions();
     this.handleLineAdded = this.handleLineAdded.bind(this);
     this.handleBoxChanged = this.handleBoxChanged.bind(this);
     this.handleGridSizeChanged = this.handleGridSizeChanged.bind(this);
