@@ -45,7 +45,6 @@ const getStore = () => cy.window().its('app.store');
  *
  */
 Cypress.Commands.add('addsLine', (from, to) => {
-  debugger;
   cy
     .get('.Dot')
     .eq(from)

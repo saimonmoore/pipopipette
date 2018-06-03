@@ -52,6 +52,7 @@ class Storage {
       snapshot.forEach(function(child) {
         const data = child.val();
         const isTesting = data.session.testing;
+        debugger;
         if (isTesting && !currentSession)
           testingSessions[data.session.session_id] = null;
       });
