@@ -270,7 +270,7 @@ class Store {
     if (this.hasWon()) {
       this.setStatus('game_over');
       this.persistSession();
-      this.destroySession();
+      // this.destroySession();
     }
   }
 
@@ -425,10 +425,11 @@ class Store {
 
     if (this.hasWon()) {
       this.setStatus('game_over');
-      this.destroySession();
-    } else {
       this.persistSession();
+      // this.destroySession();
     }
+
+    this.persistSession();
   }
 
   removeLine(line) {
