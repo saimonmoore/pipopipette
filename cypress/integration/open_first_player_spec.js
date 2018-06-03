@@ -208,6 +208,48 @@ describe('When player 1 first loads app', function() {
           });
         });
       });
+
+      context('when player 2 wins', function() {
+        before(function() {
+          cy.otherAddsLine([2, 1], [2, 2]);
+          cy.addsLine(8, 5);
+          cy.otherAddsLine([1, 2], [1, 1]);
+          cy.otherAddsLine([1, 2], [0, 2]);
+          cy.addsLine(2, 1);
+        });
+
+        it('shows 4 boxes closed', function() {
+          cy.get('.Box.Closed').should($boxes => {
+            expect($boxes).to.have.length(4);
+          });
+        });
+
+        it('shows score 2 for player 1', function() {
+          cy
+            .get(
+              '#root > div > header > div > div.LeftPanel > div > div.RightPanel > div.Score > span',
+            )
+            .invoke('text')
+            .should('eq', 'Score: 2');
+        });
+
+        it('shows score 2 for player 2', function() {
+          cy
+            .get(
+              '#root > div > header > div > div.RightPanel > div > div.RightPanel > div.Score > span',
+            )
+            .invoke('text')
+            .should('eq', 'Score: 2');
+        });
+
+        it('shows Game Over dialogue', function() {
+          cy.contains('Game Over');
+        });
+
+        it('shows it was a draw', function() {
+          cy.contains('Draw');
+        });
+      });
     });
   });
 });
