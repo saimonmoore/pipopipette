@@ -5,7 +5,7 @@
 language: node_js
 
 node_js:
-  - 10
+  - 8
 
 ## Cache folders with installed NPM modules
 ## to avoid downloading Cypress again and again
