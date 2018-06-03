@@ -5,13 +5,14 @@
 language: node_js
 
 node_js:
-  - 6
+  - 10
 
 ## Cache folders with installed NPM modules
 ## to avoid downloading Cypress again and again
 cache:
   directories:
     - ~/.npm
+    - ~/.cache
     - node_modules
 
 install:
@@ -44,7 +45,7 @@ script:
   ## CYPRESS_RECORD_KEY environment
   ## variable by default and apply
   ## this to the run.
-  - npm run cypress:run
+  - npm run cypress:run:record
 
   ## alternatively we could specify
   ## a specific record key to use
