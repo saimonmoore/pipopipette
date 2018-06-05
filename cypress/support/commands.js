@@ -48,12 +48,8 @@ Cypress.Commands.add('addsLine', (from, to) => {
   const {column: xfrom, row: yfrom} = from;
   const {column: xto, row: yto} = to;
 
-  cy
-    .get(`[data-coordinates='x:${xfrom}y:${yfrom}']`)
-    .click('left', {waitForAnimations: false});
-  cy
-    .get(`[data-coordinates='x:${xto}y:${yto}']`)
-    .click('left', {waitForAnimations: false});
+  cy.get(`[data-coordinates='x:${xfrom}y:${yfrom}']`).click('left');
+  cy.get(`[data-coordinates='x:${xto}y:${yto}']`).click('left');
 });
 
 /*

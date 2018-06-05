@@ -4,5 +4,7 @@
     "player2_colour": "green",
     "player2_id": 1
   },
-  "projectId": "u93ctt"
+  "projectId": "u93ctt",
+  "waitForAnimations": false,
+  "animationDistanceThreshold": 50
 }
