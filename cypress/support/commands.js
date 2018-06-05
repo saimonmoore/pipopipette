@@ -27,15 +27,15 @@
 const getStore = () => cy.window().its('app.store');
 
 /*
- * Assuming a grid of dots like this:
+ * Assuming a grid of dots ( e.g. 3 x 3) with x/y axis like this:
  *
- * 0 3 6
- * 1 4 7
- * 2 5 8
+ * 0 1 2
+ * 1
+ * 2
  *
  * Usage:
  *
- *   cy.addLine(0, 3)
+ *   cy.addLine({ column: 0, row: 0 }, { column: 1, row: 0 })
  *
  *   Will result in a line like this:
  *
@@ -45,14 +45,11 @@ const getStore = () => cy.window().its('app.store');
  *
  */
 Cypress.Commands.add('addsLine', (from, to) => {
-  cy
-    .get('.Dot')
-    .eq(from)
-    .click('left');
-  cy
-    .get('.Dot')
-    .eq(to)
-    .click('left');
+  const {column: xfrom, row: yfrom} = from;
+  const {column: xto, row: yto} = to;
+
+  cy.get(`[data-coordinates='x:${xfrom}y:${yfrom}']`).click('left');
+  cy.get(`[data-coordinates='x:${xto}y:${yto}']`).click('left');
 });
 
 /*
@@ -64,12 +61,9 @@ Cypress.Commands.add('addsLine', (from, to) => {
  *
  * Usage:
  *
- *   cy.OtherAddsLine([0,0], [1,0])
+ *   cy.otherAddsLine({ column: 0, row: 0 }, { column: 1, row: 0 })
  *
- *   where each argument represents columns and row coordinates:
- *
- *   from: [column, row]
- *   to:   [column, row]
+ *   where each argument represents columns and row coordinates.
  *
  *   Will result in a line like this:
  *
@@ -82,9 +76,7 @@ Cypress.Commands.add('otherAddsLine', (from, to) => {
   const colour = Cypress.env('player2_colour');
   const user_id = Cypress.env('player2_id');
   const player = {colour, user_id};
-  const fromDot = {column: from[0], row: from[1]};
-  const toDot = {column: to[0], row: to[1]};
-  const data = {from: fromDot, to: toDot, colour, player};
+  const data = {from, to, colour, player};
 
   getStore().then(store => {
     store.handleLineAdded(data);

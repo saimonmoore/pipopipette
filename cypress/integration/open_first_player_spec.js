@@ -84,7 +84,7 @@ describe('When player 1 first loads app', function() {
 
       context('when player 1 plays 1 line', function() {
         before(function() {
-          cy.addsLine(0, 3);
+          cy.addsLine({column: 0, row: 0}, {column: 1, row: 0});
         });
 
         it("shows player 2's turn", function() {
@@ -124,10 +124,10 @@ describe('When player 1 first loads app', function() {
 
       context('when player 1 closes a box', function() {
         before(function() {
-          cy.otherAddsLine([1, 0], [1, 1]);
-          cy.addsLine(4, 1);
-          cy.otherAddsLine([1, 1], [2, 1]);
-          cy.addsLine(1, 0);
+          cy.otherAddsLine({column: 1, row: 0}, {column: 1, row: 1});
+          cy.addsLine({column: 1, row: 1}, {column: 0, row: 1});
+          cy.otherAddsLine({column: 1, row: 1}, {column: 2, row: 1});
+          cy.addsLine({column: 0, row: 1}, {column: 0, row: 0});
         });
 
         it("shows player 1's turn", function() {
@@ -161,8 +161,8 @@ describe('When player 1 first loads app', function() {
 
       context('when player 2 closes a box', function() {
         before(function() {
-          cy.addsLine(7, 6);
-          cy.otherAddsLine([2, 0], [1, 0]);
+          cy.addsLine({column: 2, row: 1}, {column: 2, row: 0});
+          cy.otherAddsLine({column: 2, row: 0}, {column: 1, row: 0});
         });
 
         it("shows player 2's turn", function() {
@@ -202,11 +202,11 @@ describe('When player 1 first loads app', function() {
 
       context('when player 2 wins', function() {
         before(function() {
-          cy.otherAddsLine([2, 1], [2, 2]);
-          cy.addsLine(8, 5);
-          cy.otherAddsLine([1, 2], [1, 1]);
-          cy.otherAddsLine([1, 2], [0, 2]);
-          cy.addsLine(2, 1);
+          cy.otherAddsLine({column: 2, row: 1}, {column: 2, row: 2});
+          cy.addsLine({column: 2, row: 2}, {column: 1, row: 2});
+          cy.otherAddsLine({column: 1, row: 2}, {column: 1, row: 1});
+          cy.otherAddsLine({column: 1, row: 2}, {column: 0, row: 2});
+          cy.addsLine({column: 0, row: 2}, {column: 0, row: 1});
         });
 
         it('shows 4 boxes closed', function() {

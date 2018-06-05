@@ -48,7 +48,7 @@ class Dot extends Component {
   render() {
     const { selected } = this.state;
     const { flashing } = this.state.dot;
-    const { ourTurn } = this.props;
+    const { ourTurn, dot } = this.props;
 
     const classNames = ['Dot'];
     if (ourTurn) classNames.push('OurTurn');
@@ -65,6 +65,7 @@ class Dot extends Component {
         strokeWidth="2"
         fill={Constants.dotFill}
         className={classNames.join(' ')}
+        data-coordinates={dot.id}
         onClick={this.onClick}
       />
     );
